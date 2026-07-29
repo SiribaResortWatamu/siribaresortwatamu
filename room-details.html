@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Details | Siriba Resort Watamu</title>
+    <meta name="description" content="View details for your selected accommodation at Siriba Resort.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .room-details-container {
+            display: flex;
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 1rem;
+        }
+        
+        .room-main {
+            flex: 2;
+        }
+        
+        .room-sidebar {
+            flex: 1;
+        }
+
+        .room-hero-slider-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .room-hero-slider {
+            display: flex;
+            width: 500%;
+            height: 100%;
+            transition: transform 0.8s ease-in-out;
+            will-change: transform;
+        }
+
+        .room-hero-slider img {
+            width: 20%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slider-click-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            gap: 10px;
+        }
+
+        .room-hero-slider-container:hover .slider-click-overlay {
+            opacity: 1;
+        }
+
+        /* Modal Styles */
+        .gallery-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            overflow-y: auto;
+            padding: 2rem 1rem;
+        }
+
+        .gallery-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .gallery-close {
+            position: fixed;
+            top: 1.5rem;
+            right: 2rem;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 2.5rem;
+            cursor: pointer;
+            z-index: 10001;
+            transition: color 0.2s;
+        }
+
+        .gallery-close:hover {
+            color: var(--secondary-color);
+        }
+
+        .gallery-scroll-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+        }
+
+        .gallery-scroll-container img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            object-fit: cover;
+        }
+
+        .related-rooms-section {
+            padding: 4rem 1rem;
+            background: #fff;
+        }
+
+        .related-rooms-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .related-rooms-header h2 {
+            font-size: 2.2rem;
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color, #1a2a40);
+        }
+
+        .related-rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .related-room-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .related-room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .related-room-img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .related-room-info {
+            padding: 1.5rem;
+        }
+
+        .related-room-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color, #1a2a40);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .related-room-price {
+            color: var(--secondary-color, #d4af37);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .room-header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .room-header-info h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .room-description {
+            font-size: 1.1rem;
+            color: var(--text-grey);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .amenities-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            list-style: none;
+            margin-bottom: 3rem;
+        }
+
+        .amenities-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .amenities-list i {
+            color: var(--secondary-color);
+            width: 25px;
+            text-align: center;
+        }
+
+        .booking-widget {
+            background: #fff;
+            padding: 2.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 100px;
+        }
+
+        .widget-price {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .widget-price span {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .widget-price .per-night {
+            font-size: 1rem;
+            color: var(--text-grey);
+            font-weight: 400;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .widget-form .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .widget-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .widget-form .form-control {
+            background-color: var(--bg-light-blue);
+            border: 1px solid transparent;
+        }
+
+        .widget-form .form-control:focus {
+            background-color: #fff;
+            border-color: var(--secondary-color);
+        }
+
+        @media (max-width: 992px) {
+            .room-details-container {
+                flex-direction: column;
+            }
+            .room-sidebar {
+                margin-top: 2rem;
+            }
+            .room-hero-slider-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo">SIRIBA</a>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="accommodation.html" class="active-nav">Accommodation</a></li>
+            <li><a href="amenities.html">Amenities</a></li>
+            <li><a href="safaris.html">Safaris</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="nav-cta-wrapper">
+            <a href="accommodation.html" class="btn btn-nav">Book Now</a>
+        </div>
+    </nav>
+    
+    <header class="page-header fade-in" style="background-image: url('images/room.png'); height: 40vh;">
+        <div class="hero-overlay"></div>
+        <h1 id="page-header-title">Room Details</h1>
+    </header>
+
+    <div class="bg-sand">
+        <div class="room-details-container fade-in">
+            <div class="room-main">
+                <div class="room-hero-slider-container" id="slider-container">
+                    <div class="room-hero-slider" id="room-hero-slider">
+                        <!-- Images will be injected here -->
+                    </div>
+                    <div class="slider-click-overlay">
+                        <i class="fa-solid fa-expand"></i> View Gallery
+                    </div>
+                </div>
+                
+                <div class="room-header-info">
+                    <div>
+                        <h1 id="room-title">Room Name</h1>
+                    </div>
+                </div>
+
+                <p class="room-description" id="room-desc">
+                    Loading room description...
+                </p>
+
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.8rem;">Features & Amenities</h3>
+                <ul class="amenities-list" id="room-features">
+                    <!-- Features injected here -->
+                </ul>
+            </div>
+
+            <div class="room-sidebar">
+                <div class="booking-widget">
+                    <div class="widget-price">
+                        <span id="widget-price-val">...</span> <span class="per-night">/ night</span>
+                    </div>
+
+                    <form class="widget-form" id="room-details-widget-form">
+                        <input type="hidden" name="room" id="hidden-room-input">
+                        <div class="form-group">
+                            <label>Check In</label>
+                            <input type="date" class="form-control" id="widget-arrival" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Check Out</label>
+                            <input type="date" class="form-control" id="widget-departure" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Guests</label>
+                            <select class="form-control" id="widget-guests" required>
+                                <option value="1">1 Person</option>
+                                <option value="2" selected>2 People</option>
+                                <option value="3">3 People</option>
+                                <option value="4">4 People</option>
+                                <option value="5">5+ People</option>
+                            </select>
+                        </div>
+                        <div id="widget-summary" class="always-show" style="display:none; margin-top: 1rem; padding: 15px; background: rgba(0,0,0,0.03); border-radius: 8px; font-size: 0.95rem; color: var(--text-dark);">
+                            <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
+                                <strong>Total Nights:</strong> <span id="widget-nights">0</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <strong>Total Amount:</strong> <span style="font-weight:700; color:var(--primary-color);">$<span id="widget-total-price">0</span></span>
+                            </div>
+                        </div>
+                        <button type="button" class="btn open-booking-modal-btn" style="width: 100%; margin-top: 1rem; font-size: 1.1rem; padding: 1rem;">Reserve Now</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Apartments Section -->
+    <section class="related-rooms-section">
+        <div class="container">
+            <div class="related-rooms-header">
+                <h2>Explore Other Accommodations</h2>
+            </div>
+            <div class="related-rooms-grid" id="related-rooms-grid">
+                <!-- Related rooms will be injected here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Modal -->
+    <div class="gallery-modal" id="gallery-modal">
+        <button class="gallery-close" id="gallery-close"><i class="fa-solid fa-times"></i></button>
+        <div class="gallery-scroll-container" id="gallery-scroll-container">
+            <!-- Images will be injected here -->
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeBookingModal">&times;</span>
+            <h2 class="section-title" style="margin-bottom: 2rem; font-size: 2rem;">Complete Your Booking</h2>
+            <form id="finalBookingForm" class="contact-form" style="padding: 0; box-shadow: none;">
+                <div class="modal-grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark); margin-bottom: 0.5rem; display: block;">Selected Apartment</label>
+                        <select class="form-control" id="modal-apartment" style="font-weight:600; cursor: pointer; appearance: auto;">
+                            <option value="">Select an apartment</option>
+                            <option value="Platinum Penthouse">Platinum Penthouse</option>
+                            <option value="Pearl Studio">Pearl Studio</option>
+                            <option value="Sapphire Apartment">Sapphire Apartment</option>
+                            <option value="Ruby Apartment">Ruby Apartment</option>
+                            <option value="Gold Apartment">Gold Apartment</option>
+                            <option value="Diamond Apartment">Diamond Apartment</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark); margin-bottom: 0.5rem; display: block;">Arrival</label>
+                            <input type="date" class="form-control" id="modal-arrival" required style="font-weight:600;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark); margin-bottom: 0.5rem; display: block;">Departure</label>
+                            <input type="date" class="form-control" id="modal-departure" required style="font-weight:600;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark); margin-bottom: 0.5rem; display: block;">Adults</label>
+                        <select class="form-control" id="modal-adults" style="font-weight:600; cursor: pointer; appearance: auto;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6+</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark); margin-bottom: 0.5rem; display: block;">Children</label>
+                        <select class="form-control" id="modal-children" style="font-weight:600; cursor: pointer; appearance: auto;">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5+</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="booking-summary" style="background:#f8f9fa; padding:15px; border-radius:8px; margin-top:1.5rem; text-align:center; border: 1px solid #e9ecef;">
+                    <p style="margin:0 0 5px 0; font-weight:600; font-size:1.1rem; color: var(--text-dark);"><span id="modal-nights">0</span> Nights x $<span id="modal-price-per-night">0</span>/night</p>
+                    <h3 style="margin:0; color:var(--primary-color);">Total: $<span id="modal-total-price">0</span></h3>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 2rem 0;">
+
+                <div class="form-group">
+                    <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark); margin-bottom: 0.5rem; display: block;">Special Requests / Messages (Optional)</label>
+                    <textarea class="form-control" placeholder="Any special requests or custom messages?" id="modal-requests" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark); margin-bottom: 0.5rem; display: block;">Full Name</label>
+                    <input type="text" class="form-control" placeholder="John Doe" required id="modal-name">
+                </div>
+                <div class="modal-grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark); margin-bottom: 0.5rem; display: block;">Email Address</label>
+                        <input type="email" class="form-control" placeholder="john@example.com" required id="modal-email">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark); margin-bottom: 0.5rem; display: block;">Phone Number</label>
+                        <input type="tel" class="form-control" placeholder="+254 723 862 921" required id="modal-phone">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%; border-radius: 8px; padding: 1rem;">Confirm Booking Request</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-col">
+                    <h3>Siriba Resort</h3>
+                    <p>Luxury, Comfort & Coastal Living in Watamu, Kenya. Your ultimate destination for relaxation and adventure.</p>
+                </div>
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="accommodation.html">Accommodation</a></li>
+                        <li><a href="amenities.html">Amenities</a></li>
+                        <li><a href="safaris.html">Safaris</a></li>
+                        <li><a href="admin.html">Admin Dashboard</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Contact Us</h3>
+                    <ul class="footer-links">
+                        <li><i class="fa-solid fa-location-dot" style="margin-right:10px; color:var(--secondary-color);"></i> Neverland Junction, Jacaranda Road, Watamu</li>
+                        <li><i class="fa-solid fa-phone" style="margin-right:10px; color:var(--secondary-color);"></i> <a href="tel:+254723862921" style="color: inherit; text-decoration: none;">+254 723 862 921</a></li>
+                        <li><i class="fa-brands fa-whatsapp" style="margin-right:10px; color:var(--secondary-color);"></i> <a href="https://wa.me/254723862921" target="_blank" style="color: inherit; text-decoration: none;">+254 723 862 921</a></li>
+                        <li><i class="fa-solid fa-envelope" style="margin-right:10px; color:var(--secondary-color);"></i> <a href="mailto:siribaresortwatamu@gmail.com" style="color: inherit; text-decoration: none;">siribaresortwatamu@gmail.com</a></li>
+                    </ul>
+                    <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                        <a href="https://web.facebook.com/profile.php?id=61572056341645" target="_blank" style="color: var(--secondary-color); font-size: 1.5rem;"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/siribaresortwatamu/" target="_blank" style="color: var(--secondary-color); font-size: 1.5rem;"><i class="fa-brands fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; <span id="year"></span> Siriba Resort. All rights reserved. Designed for excellence.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script src="firebase-init.js"></script>
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        const roomData = {
+            "platinum": {
+                title: "Platinum Penthouse",
+                price: "$450",
+                desc: "The epitome of coastal luxury with expansive living areas and unparalleled breathtaking views. Enjoy maximum comfort in our top-tier penthouse designed for the ultimate relaxation. Features an exclusive pagola and luxurious furnishings.",
+                features: [
+                    { icon: "fa-bed", text: "3 Bedrooms (All en-suite)" },
+                    { icon: "fa-bath", text: "3 Bathrooms" },
+                    { icon: "fa-kitchen-set", text: "Fully Equipped Kitchen" },
+                    { icon: "fa-umbrella-beach", text: "Private Pagola" },
+                    { icon: "fa-wifi", text: "High-Speed Wi-Fi" },
+                    { icon: "fa-tv", text: "Smart TVs" },
+                    { icon: "fa-wind", text: "Central Air Conditioning" }
+                ]
+            },
+            "pearl": {
+                title: "Pearl Studio",
+                price: "$150",
+                desc: "A chic space featuring modern decor, perfect for couples looking for an intimate retreat. This beautifully appointed studio combines elegance and practicality with a warm, pearl-inspired aesthetic.",
+                features: [
+                    { icon: "fa-bed", text: "1 King Size Bed" },
+                    { icon: "fa-bath", text: "1 Bathroom" },
+                    { icon: "fa-wifi", text: "Free High-Speed Wi-Fi" },
+                    { icon: "fa-tv", text: "Smart TV" },
+                    { icon: "fa-wind", text: "Air Conditioning" }
+                ]
+            },
+            "sapphire": {
+                title: "Sapphire Apartment",
+                price: "$250",
+                desc: "Spacious luxury offering a beautiful living area and fully-equipped kitchen. Decorated with subtle sapphire blue tones, reflecting the beauty of the Watamu ocean.",
+                features: [
+                    { icon: "fa-bed", text: "2 Bedrooms (1 En-suite)" },
+                    { icon: "fa-bath", text: "2 Bathrooms" },
+                    { icon: "fa-sink", text: "Kitchenette" },
+                    { icon: "fa-wind", text: "Air Conditioning" },
+                    { icon: "fa-wifi", text: "Free Wi-Fi" }
+                ]
+            },
+            "ruby": {
+                title: "Ruby Apartment",
+                price: "$250",
+                desc: "Elegant design with a vibrant atmosphere, ideal for families and small groups. Ruby offers a warm and inviting space with top-end amenities to make your stay unforgettable.",
+                features: [
+                    { icon: "fa-bed", text: "2 Bedrooms (1 En-suite)" },
+                    { icon: "fa-bath", text: "2 Bathrooms" },
+                    { icon: "fa-sink", text: "Kitchen" },
+                    { icon: "fa-wind", text: "Air Conditioning" },
+                    { icon: "fa-couch", text: "Spacious Lounge" }
+                ]
+            },
+            "gold": {
+                title: "Gold Apartment",
+                price: "$300",
+                desc: "Luxurious gold accents and premium comfort for an unforgettable coastal getaway. Elegantly styled for guests who appreciate a touch of glamour.",
+                features: [
+                    { icon: "fa-bed", text: "2 Bedrooms (1 En-suite)" },
+                    { icon: "fa-bath", text: "2 Bathrooms" },
+                    { icon: "fa-sink", text: "Premium Kitchen" },
+                    { icon: "fa-wind", text: "Air Conditioning" },
+                    { icon: "fa-star", text: "Premium Decor" }
+                ]
+            },
+            "diamond": {
+                title: "Diamond Apartment",
+                price: "$350",
+                desc: "The pinnacle of our 2-bedroom offerings, featuring brilliant design and radiant comfort. Experience clarity and luxury with expansive views and high-end finishes throughout.",
+                features: [
+                    { icon: "fa-bed", text: "2 Bedrooms (1 En-suite)" },
+                    { icon: "fa-bath", text: "2 Bathrooms" },
+                    { icon: "fa-sink", text: "Gourmet Kitchen" },
+                    { icon: "fa-wind", text: "Air Conditioning" },
+                    { icon: "fa-gem", text: "Luxury Finishes" },
+                    { icon: "fa-water", text: "Ocean Views" }
+                ]
+            }
+        };
+
+        // Get room ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get('id') || 'platinum'; // Default to platinum if not specified
+
+        const room = roomData[roomId];
+
+        if (room) {
+            document.title = `${room.title} | Siriba Resort Watamu`;
+            document.getElementById('page-header-title').textContent = room.title;
+            document.getElementById('room-title').textContent = room.title;
+            document.getElementById('room-desc').textContent = room.desc;
+            document.getElementById('widget-price-val').textContent = room.price;
+            document.getElementById('hidden-room-input').value = room.title; // for the contact form pre-fill
+
+            const featuresList = document.getElementById('room-features');
+            featuresList.innerHTML = ''; // clear loading text
+            
+            room.features.forEach(feature => {
+                const li = document.createElement('li');
+                li.innerHTML = `<i class="fa-solid ${feature.icon}"></i> ${feature.text}`;
+                featuresList.appendChild(li);
+            });
+
+            const renderGallery = (imgList) => {
+                const slider = document.getElementById('room-hero-slider');
+                const galleryScroll = document.getElementById('gallery-scroll-container');
+                slider.innerHTML = '';
+                galleryScroll.innerHTML = '';
+                
+                imgList.forEach((imgSrc, index) => {
+                    // Add to slider
+                    const sliderImg = document.createElement('img');
+                    sliderImg.src = imgSrc;
+                    sliderImg.alt = `${room.title} View ${index + 1}`;
+                    slider.appendChild(sliderImg);
+                    
+                    // Add to modal gallery
+                    const galleryImg = document.createElement('img');
+                    galleryImg.src = imgSrc;
+                    galleryImg.alt = `${room.title} Gallery View ${index + 1}`;
+                    galleryScroll.appendChild(galleryImg);
+                });
+            };
+
+            // Check for dynamic images from Firestore
+            if (typeof db !== 'undefined') {
+                db.collection('settings').doc('global').get().then(doc => {
+                    if (doc.exists && doc.data().aptImages && doc.data().aptImages[room.title]) {
+                        renderGallery(doc.data().aptImages[room.title]);
+                    } else {
+                        renderGallery(room.images);
+                    }
+                }).catch(() => {
+                    renderGallery(room.images);
+                });
+            } else {
+                renderGallery(room.images);
+            }
+
+            // Slider Animation
+            let currentSlide = 0;
+            const totalSlides = images.length;
+            setInterval(() => {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                slider.style.transform = `translateX(-${currentSlide * (100 / totalSlides)}%)`;
+            }, 2000);
+
+            // Modal Logic
+            const sliderContainer = document.getElementById('slider-container');
+            const modal = document.getElementById('gallery-modal');
+            const closeBtn = document.getElementById('gallery-close');
+
+            sliderContainer.addEventListener('click', () => {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            });
+
+            closeBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            // Close on background click
+            modal.addEventListener('click', (e) => {
+                if(e.target === modal || e.target === document.querySelector('.gallery-scroll-container')) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Populate related rooms
+            const relatedGrid = document.getElementById('related-rooms-grid');
+            let count = 0;
+            for (const [key, data] of Object.entries(roomData)) {
+                if (key !== roomId && count < 3) {
+                    const card = document.createElement('a');
+                    card.href = `room-details.html?id=${key}`;
+                    card.className = 'related-room-card';
+                    
+                    // Uses available default images
+                    const roomImages = data.images || ["images/room.png", "images/hero.png", "images/spa.png"];
+                    const thumbImg = roomImages[count % roomImages.length]; 
+                    
+                    card.innerHTML = `
+                        <img src="${thumbImg}" alt="${data.title}" class="related-room-img">
+                        <div class="related-room-info">
+                            <h3 class="related-room-title">${data.title}</h3>
+                            <p class="related-room-price">From ${data.price} / night</p>
+                        </div>
+                    `;
+                    relatedGrid.appendChild(card);
+                    count++;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+

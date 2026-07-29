@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amenities | Siriba Resort Watamu</title>
+    <meta name="description" content="Discover the world-class amenities at Siriba Resort, including spa, fine dining, fitness, and family events.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .amenities-split-section {
+            width: 100%;
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+        }
+
+        .split-row {
+            display: flex;
+            width: 100%;
+            min-height: 60vh;
+            background: #fff;
+            align-items: center;
+        }
+
+        .coming-soon-tag {
+            display: inline-block;
+            background: #1a2a40;
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            vertical-align: middle;
+            margin-left: 1rem;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        body {
+            background-color: #fff;
+        }
+
+        .split-row.reverse {
+            flex-direction: row-reverse;
+        }
+
+        .split-image {
+            flex: 1;
+            background-size: cover;
+            background-position: center;
+            border-radius: 24px;
+            margin: 1.5rem;
+            min-height: 400px;
+        }
+
+        .split-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 5rem 10%;
+            background: #fff;
+        }
+
+        .split-text h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            color: var(--primary-color, #1a2a40);
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .split-text p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        @media (max-width: 992px) {
+            .split-row, .split-row.reverse {
+                flex-direction: column;
+            }
+            .split-image {
+                width: calc(100% - 2rem);
+                margin: 1rem;
+                min-height: 300px;
+            }
+            .split-text {
+                padding: 2rem 1rem 4rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <img src="images/Siriba Resort Watamu Logo Design-white.png" alt="Siriba Resort Logo" class="logo-img logo-white">
+            <img src="images/Siriba Resort Watamu Logo Design-black.png" alt="Siriba Resort Logo" class="logo-img logo-black">
+        </a>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="accommodation.html">Accommodation</a></li>
+            <li><a href="amenities.html">Amenities</a></li>
+            <li><a href="safaris.html">Safaris</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="nav-cta-wrapper">
+            <a href="accommodation.html" class="btn btn-nav">Book Now</a>
+        </div>
+    </nav>
+    
+    <header class="page-header fade-in" style="background-image: url('images/spa.png');">
+        <div class="hero-overlay"></div>
+        <h1>World-Class Amenities</h1>
+    </header>
+
+    <section class="amenities-split-section fade-in">
+        <!-- Cafe and Restaurant -->
+        <div class="split-row">
+            <div class="split-image" style="background-image: url('images/dining.png');"></div>
+            <div class="split-text">
+                <h2>Cafe and Restaurant <span class="coming-soon-tag">Coming Soon</span></h2>
+                <p>Savor the taste of Kenya and beyond with our curated Cultural Fusion Menu ... blending local flavors with international cuisine in a relaxed, elegant dining setting.</p>
+            </div>
+        </div>
+        
+        <!-- Swimming Pool -->
+        <div class="split-row reverse">
+            <div class="split-image" style="background-image: url('images/hero.png');"></div>
+            <div class="split-text">
+                <h2>Swimming Pool <span class="coming-soon-tag">Coming Soon</span></h2>
+                <p>Dive into serenity in our crystal-clear swimming pool ... the perfect spot to unwind, soak up the sun, or enjoy a quiet evening swim under the stars.</p>
+            </div>
+        </div>
+
+        <!-- Gym -->
+        <div class="split-row">
+            <div class="split-image" style="background-image: url('images/room.png');"></div>
+            <div class="split-text">
+                <h2>Gym <span class="coming-soon-tag">Coming Soon</span></h2>
+                <p>Stay on top of your fitness goals with our fully equipped gym, open around the clock. Personalized training sessions ensure a private and motivating workout experience.</p>
+            </div>
+        </div>
+
+        <!-- Sports & Recreation -->
+        <div class="split-row reverse">
+            <div class="split-image" style="background-image: url('images/hero.png');"></div>
+            <div class="split-text">
+                <h2>Sports & Recreation <span class="coming-soon-tag">Coming Soon</span></h2>
+                <p>Keep the energy flowing with our sports facilities ... including a <strong>basketball court, table tennis, badminton, and a running track</strong>. Stay active while enjoying the vibrant outdoor atmosphere of Watamu Sunrise.</p>
+            </div>
+        </div>
+
+        <!-- Spa & Massage -->
+        <div class="split-row">
+            <div class="split-image" style="background-image: url('images/spa.png');"></div>
+            <div class="split-text">
+                <h2>Spa & Massage <span class="coming-soon-tag">Coming Soon</span></h2>
+                <p>Indulge in total relaxation at our world-class spa. Our professional therapists offer a range of rejuvenating treatments designed to refresh your body, calm your mind, and restore your inner balance.</p>
+            </div>
+        </div>
+
+        <!-- Kids' Corner -->
+        <div class="split-row reverse">
+            <div class="split-image" style="background-image: url('images/room.png');"></div>
+            <div class="split-text">
+                <h2>Kids’ Corner <span class="coming-soon-tag">Coming Soon</span></h2>
+                <p>A creative escape for young guests! Kids can paint, play, and snack in a safe, fun environment designed to spark imagination and joy.</p>
+            </div>
+        </div>
+
+        <!-- Event Hosting Spaces -->
+        <div class="split-row">
+            <div class="split-image" style="background-image: url('images/dining.png');"></div>
+            <div class="split-text">
+                <h2>Event Hosting Spaces <span class="coming-soon-tag">Coming Soon</span></h2>
+                <p>Celebrate life’s special moments in our versatile event spaces — ideal for honeymoons, weddings, birthdays, or surprise gatherings. Let Watamu Sunrise set the stage for unforgettable memories.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-col">
+                    <h3>Siriba Resort</h3>
+                    <p>Luxury, Comfort & Coastal Living in Watamu, Kenya. Your ultimate destination for relaxation and adventure.</p>
+                </div>
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="accommodation.html">Accommodation</a></li>
+                        <li><a href="amenities.html">Amenities</a></li>
+                        <li><a href="safaris.html">Safaris</a></li>
+                        <li><a href="admin.html">Admin Dashboard</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Contact Us</h3>
+                    <ul class="footer-links">
+                        <li><i class="fa-solid fa-location-dot" style="margin-right:10px; color:var(--secondary-color);"></i> Neverland Junction, Jacaranda Road, Watamu</li>
+                        <li><i class="fa-solid fa-phone" style="margin-right:10px; color:var(--secondary-color);"></i> <a href="tel:+254723862921" style="color: inherit; text-decoration: none;">+254 723 862 921</a></li>
+                        <li><i class="fa-brands fa-whatsapp" style="margin-right:10px; color:var(--secondary-color);"></i> <a href="https://wa.me/254723862921" target="_blank" style="color: inherit; text-decoration: none;">+254 723 862 921</a></li>
+                        <li><i class="fa-solid fa-envelope" style="margin-right:10px; color:var(--secondary-color);"></i> <a href="mailto:siribaresortwatamu@gmail.com" style="color: inherit; text-decoration: none;">siribaresortwatamu@gmail.com</a></li>
+                    </ul>
+                    <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                        <a href="https://web.facebook.com/profile.php?id=61572056341645" target="_blank" style="color: var(--secondary-color); font-size: 1.5rem;"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/siribaresortwatamu/" target="_blank" style="color: var(--secondary-color); font-size: 1.5rem;"><i class="fa-brands fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; <span id="year"></span> Siriba Resort. All rights reserved. Designed for excellence.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Siriba Resort</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-storage-compat.js"></script>
+    <script src="firebase-init.js"></script>
+
+    <!-- FullCalendar -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        
+        /* Auth Container */
+        #auth-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .login-box {
+            background: #fff;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .login-box h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+        
+        /* Dashboard Container */
+        #dashboard-container {
+            display: none;
+            height: 100vh;
+        }
+        
+        /* Sidebar layout */
+        .dashboard-wrapper {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 260px;
+            background: var(--primary-color);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-header h1 {
+            color: #fff;
+            margin: 0;
+            font-size: 1.5rem;
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 2px;
+        }
+        .sidebar-menu {
+            flex: 1;
+            padding: 1.5rem 0;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            gap: 15px;
+            font-weight: 500;
+            border-left: 4px solid transparent;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+            border-left-color: var(--secondary-color);
+        }
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-logout {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.5);
+            color: #fff;
+            padding: 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+        .btn-logout:hover {
+            background: #fff;
+            color: var(--primary-color);
+        }
+        
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem 3rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e0e5eb;
+        }
+        .page-header h2 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .stat-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: rgba(16, 142, 192, 0.1); /* Secondary color faint */
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .stat-info h4 {
+            margin: 0 0 5px 0;
+            color: var(--text-grey);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .stat-info span {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        .tab-content { display: none; margin-top: 1rem; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Table Styles */
+        .table-wrapper {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .table-title {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-table th, .data-table td {
+            text-align: left;
+            padding: 1rem 0.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.95rem;
+        }
+        .data-table th {
+            color: var(--text-grey);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+        .data-table tr:hover {
+            background-color: #fdfdfd;
+        }
+        
+        /* Badges */
+        .badge {
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-confirmed, .pay-paid { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+        .pay-unpaid { background: #f8d7da; color: #721c24; }
+        
+        .action-flex {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            background: none;
+            border: 1px solid #ddd;
+            color: #555;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+        .action-btn:hover { background: #f0f0f0; }
+        .btn-confirm { border-color: #28a745; color: #28a745; }
+        .btn-confirm:hover { background: #28a745; color: #fff; }
+        .btn-cancel { border-color: #dc3545; color: #dc3545; }
+        .btn-cancel:hover { background: #dc3545; color: #fff; }
+        .btn-pay { border-color: #17a2b8; color: #17a2b8; }
+        .btn-pay:hover { background: #17a2b8; color: #fff; }
+        
+        .modal-overlay {
+            display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+            background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;
+        }
+        .modal-content {
+            background:#fff; padding:2.5rem; border-radius:12px; width:100%; max-width:600px; 
+            max-height:90vh; overflow-y:auto; box-shadow:0 15px 30px rgba(0,0,0,0.2);
+        }
+        /* Dropzone Styles */
+        .dropzone-container {
+            margin-top: 15px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background: #fff;
+            transition: all 0.3s;
+            cursor: pointer;
+            color: #777;
+        }
+        .dropzone-container.dragover {
+            border-color: var(--secondary-color);
+            background: rgba(198, 72, 57, 0.05);
+            color: var(--primary-color);
+        }
+        .dropzone-container i {
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .upload-progress-bar {
+            height: 4px;
+            background: var(--secondary-color);
+            width: 0%;
+            transition: width 0.3s;
+            margin-top: 10px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Auth View -->
+    <div id="auth-container">
+        <div class="login-box">
+            <h2>Admin Login</h2>
+            <form id="loginForm">
+                <div class="form-group" style="text-align: left; margin-bottom: 1rem;">
+                    <label>Email</label>
+                    <input type="email" class="form-control" id="adminEmail" required>
+                </div>
+                <div class="form-group" style="text-align: left; margin-bottom: 1.5rem;">
+                    <label>Password</label>
+                    <input type="password" class="form-control" id="adminPassword" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Login</button>
+            </form>
+            <p id="authError" style="color: red; margin-top: 1rem; display: none;"></p>
+        </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboard-container">
+        <div class="dashboard-wrapper">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h1>SIRIBA</h1>
+                    <span style="font-size: 0.8rem; opacity: 0.8; letter-spacing: 1px;">MANAGEMENT</span>
+                </div>
+                <nav class="sidebar-menu">
+                    <a class="nav-item active" onclick="switchTab('overview')"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+                    <a class="nav-item" onclick="switchTab('rooms')"><i class="fa-solid fa-key"></i> Reservations</a>
+                    <a class="nav-item" onclick="switchTab('safaris')"><i class="fa-solid fa-van-shuttle"></i> Safaris</a>
+                    <a class="nav-item" onclick="switchTab('calendar')"><i class="fa-solid fa-calendar-days"></i> Calendar</a>
+                    <a class="nav-item" onclick="switchTab('settings')"><i class="fa-solid fa-gear"></i> Settings</a>
+                </nav>
+                <div class="sidebar-footer">
+                    <button class="btn-logout" id="logoutBtn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <header class="page-header">
+                    <h2 id="page-title">Overview</h2>
+                </header>
+
+                <!-- TAB: OVERVIEW -->
+                <div class="tab-content active" id="overview-tab">
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fa-solid fa-bed"></i></div>
+                            <div class="stat-info">
+                                <h4>Active & Pending Rooms</h4>
+                                <span id="stat-active-rooms">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="color: #dc3545; background: rgba(220,53,69,0.1);"><i class="fa-solid fa-coins"></i></div>
+                            <div class="stat-info">
+                                <h4>Unpaid Bookings</h4>
+                                <span id="stat-unpaid">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="color: #28a745; background: rgba(40,167,69,0.1);"><i class="fa-solid fa-plane-arrival"></i></div>
+                            <div class="stat-info">
+                                <h4>Total Safaris</h4>
+                                <span id="stat-safaris">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <h3 class="table-title">Recent Booking Activity</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Guest</th>
+                                    <th>Apartment</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Res Status</th>
+                                    <th>Payment</th>
+                                </tr>
+                            </thead>
+                            <tbody id="overview-table-body">
+                                <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB: ROOM RESERVATIONS -->
+                <div class="tab-content" id="rooms-tab">
+                    <div class="table-wrapper">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem;">
+                            <h3 class="table-title" style="margin-bottom:0;">All Room Reservations</h3>
+                            <button class="btn" style="padding: 0.6rem 1rem; font-size: 0.9rem;" onclick="document.getElementById('manualBookingModal').style.display='flex'">+ Add Booking</button>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date Requested</th>
+                                    <th>Guest Info</th>
+                                    <th>Apartment / Dates</th>
+                                    <th>Status</th>
+                                    <th>Payment</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rooms-table-body">
+                                <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB: SAFARIS -->
+                <div class="tab-content" id="safaris-tab">
+                    <div class="table-wrapper">
+                        <h3 class="table-title">Safari Excursions</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date Requested</th>
+                                    <th>Guest Info</th>
+                                    <th>Safari Package</th>
+                                    <th>Travel Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="safaris-table-body">
+                                <tr><td colspan="6" style="text-align:center;">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB: CALENDAR -->
+                <div class="tab-content" id="calendar-tab">
+                    <div class="table-wrapper" style="padding: 1.5rem;">
+                        <h3 class="table-title">Availability Calendar</h3>
+                        <div id="calendar" style="min-height: 600px;"></div>
+                    </div>
+                </div>
+
+                <!-- TAB: SETTINGS -->
+                <div class="tab-content" id="settings-tab">
+                    <div class="table-wrapper">
+                        <h3 class="table-title">Global Settings</h3>
+                        <form id="adminSettingsForm">
+                            <div style="display:flex; align-items:center; gap:2rem; margin-bottom: 1.5rem; flex-wrap:wrap;">
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label style="display:flex; align-items:center; gap:10px; font-weight:600; font-size:1.1rem; cursor:pointer;">
+                                        <input type="checkbox" id="settingShowPrices" style="width:20px; height:20px;"> Show Prices on Website
+                                    </label>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0; flex:1; max-width:250px;">
+                                    <label style="font-weight:600; display:block; margin-bottom:5px;">Exchange Rate (1 USD = X KES)</label>
+                                    <input type="number" class="form-control" id="exchangeRate" value="130" step="any">
+                                </div>
+                            </div>
+
+                            <hr style="border: 0; border-top: 1px solid #eee; margin: 2rem 0;">
+
+                            <h4 style="color:var(--primary-color); margin-bottom:1rem;">Block Dates</h4>
+                            <div style="display:flex; flex-wrap:wrap; gap:1rem; align-items:flex-end; margin-bottom:1rem;">
+                                <div class="form-group" style="margin-bottom:0; flex:1; min-width: 200px;">
+                                    <label>Apartment</label>
+                                    <select class="form-control" id="blockApartment">
+                                        <option value="all">All Apartments</option>
+                                        <option value="Platinum Penthouse">Platinum Penthouse</option>
+                                        <option value="Pearl Studio">Pearl Studio</option>
+                                        <option value="Sapphire Apartment">Sapphire Apartment</option>
+                                        <option value="Ruby Apartment">Ruby Apartment</option>
+                                        <option value="Gold Apartment">Gold Apartment</option>
+                                        <option value="Diamond Apartment">Diamond Apartment</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0; flex:1; min-width: 150px;">
+                                    <label>Start Date</label>
+                                    <input type="date" class="form-control" id="blockStartDate">
+                                </div>
+                                <div class="form-group" style="margin-bottom:0; flex:1; min-width: 150px;">
+                                    <label>End Date</label>
+                                    <input type="date" class="form-control" id="blockEndDate">
+                                </div>
+                                <div class="form-group" style="margin-bottom:0; flex:2; min-width: 200px;">
+                                    <label>Reason (Optional)</label>
+                                    <input type="text" class="form-control" id="blockReason" placeholder="e.g. Maintenance">
+                                </div>
+                                <button type="button" class="btn btn-outline" id="addBlockDateBtn" style="padding: 0 1.5rem; height:45px;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                            <ul id="blockedDatesList" style="list-style:none; padding:0; margin-bottom:2rem;">
+                                <!-- Render blocked dates here -->
+                            </ul>
+
+                            <hr style="border: 0; border-top: 1px solid #eee; margin: 2rem 0;">
+
+                            <h4 style="color:var(--primary-color); margin-bottom:1rem;">Apartment Prices (USD / Night)</h4>
+                            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem; margin-bottom:2rem;" id="aptPricesInputs">
+                                <!-- Generated by JS -->
+                            </div>
+
+                            <hr style="border: 0; border-top: 1px solid #eee; margin: 2rem 0;">
+
+                            <h4 style="color:var(--primary-color); margin-bottom:1rem;">Apartment Gallery Images</h4>
+                            <p style="color:var(--text-grey); font-size:0.9rem; margin-bottom:1.5rem;">Manage the images displayed in the room details gallery. Best image size is 1200x800px.</p>
+                            <div id="aptImagesContainer" style="display:flex; flex-direction:column; gap:2rem; margin-bottom:2.5rem;">
+                                <!-- Generated by JS -->
+                            </div>
+
+                             <button type="submit" class="btn" id="saveSettingsBtn" style="padding:1rem 2rem;">Save All Settings</button>
+                            <span id="saveSettingsMsg" style="margin-left:1rem; color:green; display:none; font-weight:600;"><i class="fa-solid fa-check"></i> Settings Saved!</span>
+                        </form>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Manual Booking Modal -->
+    <div id="manualBookingModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-top:0; margin-bottom:1.5rem; color:var(--primary-color); font-family: 'Playfair Display', serif;">Add Reservation</h3>
+            <form id="adminBookingForm">
+                <div class="form-group"><label>Guest Name</label><input type="text" class="form-control" name="name" required></div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <div class="form-group" style="flex:1; min-width:200px;"><label>Email</label><input type="email" class="form-control" name="email" required></div>
+                    <div class="form-group" style="flex:1; min-width:200px;"><label>Phone</label><input type="text" class="form-control" name="phone"></div>
+                </div>
+                <div class="form-group"><label>Apartment</label>
+                    <select class="form-control" name="apartment" required>
+                        <option value="Platinum Penthouse">Platinum Penthouse</option>
+                        <option value="Pearl Studio">Pearl Studio</option>
+                        <option value="Sapphire Apartment">Sapphire Apartment</option>
+                        <option value="Ruby Apartment">Ruby Apartment</option>
+                        <option value="Gold Apartment">Gold Apartment</option>
+                        <option value="Diamond Apartment">Diamond Apartment</option>
+                    </select>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div class="form-group" style="flex:1;"><label>Arrival Date</label><input type="date" class="form-control" name="arrival" required></div>
+                    <div class="form-group" style="flex:1;"><label>Departure Date</label><input type="date" class="form-control" name="departure" required></div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div class="form-group" style="flex:1;"><label>Adults</label><input type="number" class="form-control" name="adults" value="2" min="1" required></div>
+                    <div class="form-group" style="flex:1;"><label>Children</label><input type="number" class="form-control" name="children" value="0" min="0"></div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div class="form-group" style="flex:1;"><label>Status</label>
+                        <select class="form-control" name="status">
+                            <option value="confirmed">Confirmed</option>
+                            <option value="pending">Pending</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex:1;"><label>Payment</label>
+                        <select class="form-control" name="payment">
+                            <option value="paid">Paid</option>
+                            <option value="unpaid">Unpaid</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:2rem;">
+                    <button type="submit" class="btn" style="flex:2;">Save Reservation</button>
+                    <button type="button" class="btn btn-outline" style="flex:1;" onclick="document.getElementById('manualBookingModal').style.display='none'">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let calendar;
+        let allReservations = []; // to power stats
+
+        // Escapes untrusted Firestore data before it's interpolated into innerHTML,
+        // since reservation/safari docs are writable by anonymous site visitors.
+        function esc(value) {
+            if (value === null || value === undefined) return '';
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Tab Logic
+        function switchTab(tabId) {
+            // Update Active Link
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            // Update Title
+            const titles = {
+                'overview': 'Overview',
+                'rooms': 'Room Reservations',
+                'safaris': 'Safari Bookings',
+                'calendar': 'Availability Calendar',
+                'settings': 'Global Settings'
+            };
+            document.getElementById('page-title').textContent = titles[tabId];
+
+            // Update Views
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabId + '-tab').classList.add('active');
+
+            if(tabId === 'calendar' && calendar) {
+                calendar.render(); 
+            }
+        }
+
+        // Init Calendar
+        function initCalendar() {
+            var calendarEl = document.getElementById('calendar');
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek'
+                },
+                events: []
+            });
+            calendar.render();
+        }
+
+        // Auth Logic
+        const authContainer = document.getElementById('auth-container');
+        const dashContainer = document.getElementById('dashboard-container');
+        const loginForm = document.getElementById('loginForm');
+        const authError = document.getElementById('authError');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                authContainer.style.display = 'none';
+                dashContainer.style.display = 'block';
+                initCalendar();
+                initSettings();
+                loadReservations();
+                loadSafaris();
+            } else {
+                authContainer.style.display = 'flex';
+                dashContainer.style.display = 'none';
+            }
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            auth.signInWithEmailAndPassword(email, password).catch(error => {
+                authError.textContent = error.message;
+                authError.style.display = 'block';
+            });
+        });
+
+        logoutBtn.addEventListener('click', () => auth.signOut());
+
+        // Load Data - Rooms & Overview
+        function loadReservations() {
+            db.collection('reservations').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+                const tbody = document.getElementById('rooms-table-body');
+                const overviewBody = document.getElementById('overview-table-body');
+                tbody.innerHTML = '';
+                overviewBody.innerHTML = '';
+                allReservations = [];
+                let calendarEvents = [];
+                
+                let activeCount = 0;
+                let unpaidCount = 0;
+
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No reservations found</td></tr>';
+                    overviewBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No recent activity</td></tr>';
+                    document.getElementById('stat-active-rooms').textContent = 0;
+                    document.getElementById('stat-unpaid').textContent = 0;
+                    if(calendar) calendar.removeAllEventSources();
+                    return;
+                }
+                
+                let limitCount = 0;
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    const cDate = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : 'N/A';
+                    const paymentStat = data.payment || 'unpaid';
+                    
+                    if(data.status !== 'cancelled') activeCount++;
+                    if(paymentStat === 'unpaid' && data.status !== 'cancelled') unpaidCount++;
+
+                    // --- FULL RESERVATIONS TABLE ---
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${cDate}</td>
+                        <td>
+                            <strong>${esc(data.name)}</strong><br>
+                            <span style="color:#666; font-size:0.85rem;">${esc(data.email)} | ${esc(data.phone)}</span><br>
+                            <span style="color:#666; font-size:0.85rem;">${esc(data.adults)} Adults, ${esc(data.children)} Children</span>
+                        </td>
+                        <td><strong>${esc(data.apartment)}</strong><br><span style="color:#666; font-size:0.85rem;"><i class="fa-regular fa-calendar"></i> ${esc(data.arrival)} to ${esc(data.departure)}</span></td>
+                        <td><span class="badge status-${esc(data.status)}">${esc(data.status)}</span></td>
+                        <td><span class="badge pay-${esc(paymentStat)}">${esc(paymentStat)}</span></td>
+                        <td>
+                            <div class="action-flex">
+                                ${data.status !== 'confirmed' ? `<button class="action-btn btn-confirm" onclick="updateMap('reservations', '${id}', {status: 'confirmed'})"><i class="fa-solid fa-check"></i></button>` : ''}
+                                ${data.status !== 'cancelled' ? `<button class="action-btn btn-cancel" title="Cancel" onclick="updateMap('reservations', '${id}', {status: 'cancelled'})"><i class="fa-solid fa-times"></i></button>` : ''}
+                                ${paymentStat === 'unpaid' ? `<button class="action-btn btn-pay" title="Mark Paid" onclick="updateMap('reservations', '${id}', {payment: 'paid'})"><i class="fa-solid fa-money-bill"></i> Pay</button>` : ''}
+                                ${paymentStat === 'paid' ? `<button class="action-btn" title="Mark Unpaid" onclick="updateMap('reservations', '${id}', {payment: 'unpaid'})"><i class="fa-solid fa-undo"></i> Reverse</button>` : ''}
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+
+                    // --- OVERVIEW TABLE (Limit to 5 recent non-cancelled) ---
+                    if (data.status !== 'cancelled' && limitCount < 6) {
+                        const ovTr = document.createElement('tr');
+                        ovTr.innerHTML = `
+                            <td><strong>${esc(data.name)}</strong></td>
+                            <td>${esc(data.apartment)}</td>
+                            <td>${esc(data.arrival)}</td>
+                            <td>${esc(data.departure)}</td>
+                            <td><span class="badge status-${esc(data.status)}">${esc(data.status)}</span></td>
+                            <td><span class="badge pay-${esc(paymentStat)}">${esc(paymentStat)}</span></td>
+                        `;
+                        overviewBody.appendChild(ovTr);
+                        limitCount++;
+                    }
+
+                    // --- CALENDAR DATA ---
+                    if(data.arrival && data.departure) {
+                        let evColor = data.status === 'confirmed' ? '#28a745' : (data.status === 'cancelled' ? '#dc3545' : '#ffc107');
+                        let evTextColor = data.status === 'pending' ? '#000' : '#fff';
+                        calendarEvents.push({
+                            id: id,
+                            title: data.apartment.substring(0, 15) + '... - ' + data.name,
+                            start: data.arrival,
+                            end: data.departure,
+                            backgroundColor: evColor,
+                            borderColor: evColor,
+                            textColor: evTextColor
+                        });
+                    }
+                });
+
+                if (typeof globalSettings !== 'undefined' && globalSettings.blockedDates) {
+                    globalSettings.blockedDates.forEach((b, idx) => {
+                        let ed = new Date(b.end);
+                        ed.setDate(ed.getDate() + 1);
+                        let titleTag = b.apartment === 'all' ? 'ALL BLOCKED' : b.apartment.substring(0, 15);
+                        let fullTitle = titleTag;
+                        if(b.reason) fullTitle += `: ${b.reason}`;
+
+                        calendarEvents.push({
+                            id: 'bl-' + idx,
+                            title: fullTitle,
+                            start: b.start,
+                            end: ed.toISOString().split('T')[0],
+                            backgroundColor: '#343a40',
+                            borderColor: '#343a40',
+                            textColor: '#fff',
+                            allDay: true
+                        });
+                    });
+                }
+
+                // Update Stats
+                document.getElementById('stat-active-rooms').textContent = activeCount;
+                document.getElementById('stat-unpaid').textContent = unpaidCount;
+
+                // Sync Calendar
+                if(calendar) {
+                    calendar.removeAllEventSources();
+                    calendar.addEventSource(calendarEvents);
+                }
+            });
+        }
+
+        // Load Safari Bookings
+        function loadSafaris() {
+            db.collection('safari_bookings').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+                const tbody = document.getElementById('safaris-table-body');
+                tbody.innerHTML = '';
+                
+                document.getElementById('stat-safaris').textContent = snapshot.docs.filter(d => d.data().status !== 'cancelled').length;
+
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No safari bookings found</td></tr>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    const cDate = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : 'N/A';
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${cDate}</td>
+                        <td>
+                            <strong>${esc(data.name)}</strong><br>
+                            <span style="color:#666; font-size:0.85rem;">${esc(data.email)}</span><br>
+                            <span style="color:#666; font-size:0.85rem;">${esc(data.adults)} Adults, ${esc(data.children)} Children</span>
+                        </td>
+                        <td>${esc(data.safari)}</td>
+                        <td>${esc(data.date)}</td>
+                        <td><span class="badge status-${esc(data.status)}">${esc(data.status)}</span></td>
+                        <td>
+                            <div class="action-flex">
+                                ${data.status !== 'confirmed' ? `<button class="action-btn btn-confirm" onclick="updateMap('safari_bookings', '${id}', {status: 'confirmed'})"><i class="fa-solid fa-check"></i></button>` : ''}
+                                ${data.status !== 'cancelled' ? `<button class="action-btn btn-cancel" onclick="updateMap('safari_bookings', '${id}', {status: 'cancelled'})"><i class="fa-solid fa-times"></i></button>` : ''}
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        // Global DB Update Wrapper
+        window.updateMap = function(collection, id, updatesObj) {
+            db.collection(collection).doc(id).update(updatesObj)
+            .catch(error => {
+                console.error("Error updating document: ", error);
+            });
+        };
+
+        // --- GLOBAL SETTINGS LOGIC ---
+        let globalSettings = {
+            showPrices: true,
+            exchangeRate: 130, // default USD -> KES
+            blockedDates: [],
+            aptPrices: {}
+        };
+
+        function initSettings() {
+            db.collection('settings').doc('global').onSnapshot(doc => {
+                if(doc.exists) {
+                    globalSettings = { ...globalSettings, ...doc.data() };
+                } else {
+                    db.collection('settings').doc('global').set(globalSettings);
+                }
+                renderSettings();
+                loadReservations(); // Re-render calendar so blocked dates reflect immediately
+            });
+        }
+
+        window.updateKES = function(inputEl, rate) {
+            const val = parseFloat(inputEl.value) || 0;
+            const kesSpan = inputEl.nextElementSibling;
+            if(kesSpan) kesSpan.textContent = '≈ ' + Math.round(val * rate).toLocaleString() + ' KES';
+        };
+
+        function renderSettings() {
+            const checkShowPrices = document.getElementById('settingShowPrices');
+            if(checkShowPrices) checkShowPrices.checked = globalSettings.showPrices !== false;
+            
+            const exRateInput = document.getElementById('exchangeRate');
+            if(exRateInput) exRateInput.value = globalSettings.exchangeRate || 130;
+            const rate = globalSettings.exchangeRate || 130;
+
+            const aptContainer = document.getElementById('aptPricesInputs');
+            if(aptContainer) {
+                aptContainer.innerHTML = '';
+                for(const [name, price] of Object.entries(globalSettings.aptPrices || {})) {
+                    aptContainer.innerHTML += `
+                        <div class="form-group" style="margin-bottom:0; background:#f8f9fa; padding:15px; border-radius:8px;">
+                            <label style="font-weight:600; color:var(--text-dark);">${name}</label>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <input type="number" class="form-control apt-price-input" data-key="${name}" value="${price}" oninput="updateKES(this, ${rate})">
+                                <span class="calc-kes" style="color:var(--text-grey); font-size:0.85rem; width:auto; white-space:nowrap;">≈ ${Math.round(price * rate).toLocaleString()} KES</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            // Render Apartment Images Section
+            const imgContainer = document.getElementById('aptImagesContainer');
+            if(imgContainer) {
+                imgContainer.innerHTML = '';
+                const apts = [
+                    "Platinum Penthouse", 
+                    "Pearl Studio", 
+                    "Sapphire Apartment", 
+                    "Ruby Apartment", 
+                    "Gold Apartment", 
+                    "Diamond Apartment"
+                ];
+                
+                if(!globalSettings.aptImages) globalSettings.aptImages = {};
+
+                apts.forEach(apt => {
+                    const images = globalSettings.aptImages[apt] || ["images/room.png"];
+                    let imagesHtml = '';
+                    images.forEach((img, idx) => {
+                        imagesHtml += `
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                                <input type="text" class="form-control apt-img-input" data-apt="${apt}" value="${img}" style="font-size:0.85rem;">
+                                <button type="button" class="action-btn btn-cancel" onclick="removeAptImage('${apt}', ${idx})"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        `;
+                    });
+
+                    imgContainer.innerHTML += `
+                        <div style="background:#fdfbf7; padding:20px; border-radius:12px; border:1px solid #eee;">
+                            <h5 style="margin-top:0; color:var(--text-dark); margin-bottom:1rem; font-family:'Playfair Display', serif;">${apt}</h5>
+                            <div id="imgs-list-${apt.replace(/\s+/g, '-')}">
+                                ${imagesHtml}
+                            </div>
+                            <button type="button" class="btn btn-outline" style="padding:0.5rem 1rem; font-size:0.8rem; margin-top:5px;" onclick="addAptImageField('${apt}')"><i class="fa-solid fa-plus"></i> Add Image URL</button>
+                            
+                            <div class="dropzone-container" id="dropzone-${apt.replace(/\s+/g, '-')}" onclick="document.getElementById('file-input-${apt.replace(/\s+/g, '-')}').click()">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <span>Drag & Drop images here or click to upload</span>
+                                <div class="upload-progress-bar" id="progress-${apt.replace(/\s+/g, '-')}"></div>
+                                <input type="file" id="file-input-${apt.replace(/\s+/g, '-')}" multiple accept="image/*" style="display:none;" onchange="handleFileUpload(event, '${apt}')">
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Set up dropzone listeners
+                apts.forEach(apt => {
+                    const dzId = `dropzone-${apt.replace(/\s+/g, '-')}`;
+                    const dz = document.getElementById(dzId);
+                    if(dz) {
+                        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                            dz.addEventListener(eventName, e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }, false);
+                        });
+
+                        dz.addEventListener('dragenter', () => dz.classList.add('dragover'), false);
+                        dz.addEventListener('dragover', () => dz.classList.add('dragover'), false);
+                        dz.addEventListener('dragleave', () => dz.classList.remove('dragover'), false);
+                        dz.addEventListener('drop', (e) => {
+                            dz.classList.remove('dragover');
+                            const files = e.dataTransfer.files;
+                            handleFileUpload({target: {files}}, apt);
+                        }, false);
+                    }
+                });
+            }
+
+            renderBlockedDates();
+        }
+
+        window.addAptImageField = function(apt) {
+            if(!globalSettings.aptImages[apt]) globalSettings.aptImages[apt] = [];
+            globalSettings.aptImages[apt].push("images/room.png");
+            initSettings();
+        };
+
+        window.removeAptImage = function(apt, idx) {
+            globalSettings.aptImages[apt].splice(idx, 1);
+            initSettings();
+        };
+
+        window.handleFileUpload = function(e, apt) {
+            if(!storage) {
+                alert("Storage not initialized. Please ensure Firebase Storage is configured.");
+                return;
+            }
+            const files = Array.from(e.target.files);
+            const progress = document.getElementById(`progress-${apt.replace(/\s+/g, '-')}`);
+            
+            files.forEach(file => {
+                const fileName = `${Date.now()}-${file.name}`;
+                const storageRef = storage.ref(`apartments/${apt}/${fileName}`);
+                const uploadTask = storageRef.put(file);
+
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        const p = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        if(progress) progress.style.width = p + '%';
+                    }, 
+                    (error) => {
+                        console.error("Upload error", error);
+                        alert("Error uploading image: " + error.message);
+                    }, 
+                    () => {
+                        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                            if(!globalSettings.aptImages[apt]) globalSettings.aptImages[apt] = [];
+                            globalSettings.aptImages[apt].push(downloadURL);
+                            if(progress) progress.style.width = '0%';
+                            initSettings();
+                        });
+                    }
+                );
+            });
+        };
+
+        function renderBlockedDates() {
+            const list = document.getElementById('blockedDatesList');
+            if(!list) return;
+            list.innerHTML = '';
+            const bl = globalSettings.blockedDates || [];
+            if(bl.length === 0) {
+                list.innerHTML = '<li style="color:#888;">No dates have been blocked.</li>';
+                return;
+            }
+            bl.forEach((range, idx) => {
+                const aptTag = range.apartment === 'all' ? 'All Apartments' : range.apartment;
+                list.innerHTML += `
+                <li style="background:#fff; padding:10px 15px; border:1px solid #ddd; border-radius:5px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <span><strong>${range.start}</strong> <i class="fa-solid fa-arrow-right" style="margin:0 10px; color:#ccc;"></i> <strong>${range.end}</strong></span><br>
+                        <small style="color:#666;">Apt: <strong>${aptTag}</strong> | Reason: <em>${range.reason || 'None'}</em></small>
+                    </div>
+                    <button type="button" class="action-btn btn-cancel" onclick="removeBlockedDate(${idx})"><i class="fa-solid fa-trash"></i></button>
+                </li>`;
+            });
+        }
+
+        window.removeBlockedDate = function(idx) {
+            globalSettings.blockedDates.splice(idx, 1);
+            saveSettings(false);
+        };
+
+        const addBlockBtn = document.getElementById('addBlockDateBtn');
+        if(addBlockBtn) {
+            addBlockBtn.addEventListener('click', () => {
+                const start = document.getElementById('blockStartDate').value;
+                const end = document.getElementById('blockEndDate').value;
+                const apt = document.getElementById('blockApartment').value;
+                const reason = document.getElementById('blockReason').value;
+                
+                if(start && end && start <= end) {
+                    if(!globalSettings.blockedDates) globalSettings.blockedDates = [];
+                    globalSettings.blockedDates.push({start, end, apartment: apt, reason});
+                    document.getElementById('blockStartDate').value = '';
+                    document.getElementById('blockEndDate').value = '';
+                    document.getElementById('blockReason').value = '';
+                    saveSettings(false);
+                } else {
+                    alert("Invalid date range selected.");
+                }
+            });
+        }
+
+        const settingsForm = document.getElementById('adminSettingsForm');
+        if(settingsForm) {
+            settingsForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                globalSettings.showPrices = document.getElementById('settingShowPrices').checked;
+                globalSettings.exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 130;
+                
+                document.querySelectorAll('.apt-price-input').forEach(input => {
+                    globalSettings.aptPrices[input.getAttribute('data-key')] = parseFloat(input.value) || 0;
+                });
+
+                // Save Images
+                globalSettings.aptImages = {};
+                document.querySelectorAll('.apt-img-input').forEach(input => {
+                    const apt = input.getAttribute('data-apt');
+                    if(!globalSettings.aptImages[apt]) globalSettings.aptImages[apt] = [];
+                    globalSettings.aptImages[apt].push(input.value);
+                });
+
+                saveSettings(true);
+            });
+        }
+
+        function saveSettings(showVisualCue) {
+            const btn = document.getElementById('saveSettingsBtn');
+            if(showVisualCue) btn.innerHTML = "Saving...";
+            
+            db.collection('settings').doc('global').set(globalSettings).then(() => {
+                if(showVisualCue) {
+                    btn.innerHTML = "Save All Settings";
+                    const msg = document.getElementById('saveSettingsMsg');
+                    msg.style.display = 'inline';
+                    setTimeout(() => msg.style.display = 'none', 3000);
+                }
+            }).catch(e => {
+                console.error("Error saving settings", e);
+                if(showVisualCue) btn.innerHTML = "Error!";
+            });
+        }
+        
+        // ADMIN MANUAL BOOKING LOGIC
+        const adminBookingForm = document.getElementById('adminBookingForm');
+        if(adminBookingForm) {
+            adminBookingForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(adminBookingForm);
+                const btn = adminBookingForm.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+                btn.disabled = true;
+
+                const reservationData = {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    apartment: formData.get('apartment'),
+                    arrival: formData.get('arrival'),
+                    departure: formData.get('departure'),
+                    adults: formData.get('adults'),
+                    children: formData.get('children'),
+                    status: formData.get('status'),
+                    payment: formData.get('payment'),
+                    source: 'admin',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                // Auto calculation
+                if (globalSettings.aptPrices && globalSettings.aptPrices[reservationData.apartment]) {
+                    const arr = new Date(reservationData.arrival);
+                    const dep = new Date(reservationData.departure);
+                    if (dep > arr) {
+                        reservationData.nights = Math.ceil((dep - arr) / (1000 * 3600 * 24));
+                        reservationData.totalPrice = reservationData.nights * globalSettings.aptPrices[reservationData.apartment];
+                    }
+                }
+
+                db.collection('reservations').add(reservationData).then(() => {
+                    adminBookingForm.reset();
+                    document.getElementById('manualBookingModal').style.display = 'none';
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }).catch(err => {
+                    console.error("Manual booking error", err);
+                    btn.innerHTML = 'Error! Try Again';
+                    btn.disabled = false;
+                });
+            });
+        }
+    </script>
+</body>
+</html>
