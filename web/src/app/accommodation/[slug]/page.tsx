@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import * as FaIcons from "react-icons/fa6";
 import type { IconType } from "react-icons";
 import PageHero from "@/components/PageHero";
 import ApartmentCard from "@/components/ApartmentCard";
+import BookingWidget from "@/components/BookingWidget";
 import {
   getApartmentBySlug,
   getRelatedApartments,
@@ -53,8 +53,8 @@ export default async function RoomDetailsPage({ params }: { params: Params }) {
       <PageHero title={apartment.name} image={images[0]} />
 
       <section className="mx-auto max-w-7xl px-6 py-16">
-        <div className="grid gap-12 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+          <div className="min-w-0 lg:col-span-2">
             {images.length > 1 && (
               <div className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {images.map((src, i) => (
@@ -85,26 +85,19 @@ export default async function RoomDetailsPage({ params }: { params: Params }) {
             </ul>
           </div>
 
-          <aside className="h-fit rounded-2xl border border-hairline bg-white p-8 shadow-sm" id="book">
-            <div className="text-ink-muted">
-              From{" "}
-              <span className="font-display text-3xl text-terracotta">${apartment.price_usd}</span>{" "}
-              / night
-            </div>
-            <p className="mt-4 text-sm text-ink-muted">
+          <aside
+            className="h-fit min-w-0 rounded-2xl border border-hairline bg-white p-5 shadow-sm sm:p-8"
+            id="book"
+          >
+            <p className="mb-5 text-sm text-ink-muted">
               {apartment.guests} guests &middot; {apartment.bedrooms} bedrooms &middot;{" "}
               {apartment.bathrooms} bathrooms
             </p>
-            <p className="mt-6 rounded-xl bg-sand p-4 text-sm text-ink-muted">
-              Online booking with live availability is coming in the next build phase. For now,
-              reach out directly to reserve this apartment.
-            </p>
-            <Link
-              href="/contact"
-              className="mt-6 block rounded-full bg-terracotta px-6 py-3 text-center font-medium text-white transition-colors hover:bg-terracotta-hover"
-            >
-              Enquire to Book
-            </Link>
+            <BookingWidget
+              apartmentId={apartment.id}
+              apartmentName={apartment.name}
+              pricePerNight={apartment.price_usd}
+            />
           </aside>
         </div>
       </section>

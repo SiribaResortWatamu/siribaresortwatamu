@@ -124,33 +124,66 @@ type TableDef<Row, Insert, Update = Partial<Insert>> = {
   Relationships: [];
 };
 
+// Columns with a DB-side default (or that are nullable) don't need to be
+// supplied on insert — mark them optional so callers can omit them.
+type WithDefaults<T, DefaultedKeys extends keyof T> = Omit<T, DefaultedKeys | "id"> &
+  Partial<Pick<T, DefaultedKeys>> & { id?: string };
+
 export type Database = {
   public: {
     Tables: {
       apartments: TableDef<
         Apartment,
-        Omit<Apartment, "id" | "created_at" | "updated_at"> & { id?: string }
+        WithDefaults<
+          Omit<Apartment, "created_at" | "updated_at">,
+          | "description"
+          | "features"
+          | "guests"
+          | "bedrooms"
+          | "bathrooms"
+          | "is_archived"
+          | "feature_on_homepage"
+          | "sort_order"
+        >
       >;
       apartment_photos: TableDef<
         ApartmentPhoto,
-        Omit<ApartmentPhoto, "id" | "created_at"> & { id?: string }
+        WithDefaults<Omit<ApartmentPhoto, "created_at">, "order" | "is_cover">
       >;
       bookings: TableDef<
         Booking,
-        Omit<Booking, "id" | "nights" | "created_at" | "updated_at"> & { id?: string }
+        WithDefaults<
+          Omit<Booking, "nights" | "created_at" | "updated_at">,
+          | "guest_phone"
+          | "adults"
+          | "children"
+          | "special_requests"
+          | "status"
+          | "payment_status"
+          | "source"
+        >
       >;
       safari_packages: TableDef<
         SafariPackage,
-        Omit<SafariPackage, "id" | "created_at" | "updated_at"> & { id?: string }
+        WithDefaults<
+          Omit<SafariPackage, "created_at" | "updated_at">,
+          "description" | "duration_label" | "price_usd" | "images" | "is_archived" | "sort_order"
+        >
       >;
       safari_bookings: TableDef<
         SafariBooking,
-        Omit<SafariBooking, "id" | "created_at"> & { id?: string }
+        WithDefaults<
+          Omit<SafariBooking, "created_at">,
+          "safari_package_id" | "travel_date" | "adults" | "children" | "notes" | "status"
+        >
       >;
-      messages: TableDef<ContactMessage, Omit<ContactMessage, "id" | "created_at"> & { id?: string }>;
+      messages: TableDef<
+        ContactMessage,
+        WithDefaults<Omit<ContactMessage, "created_at">, "phone" | "subject" | "is_read">
+      >;
       blocked_dates: TableDef<
         BlockedDate,
-        Omit<BlockedDate, "id" | "created_at"> & { id?: string }
+        WithDefaults<Omit<BlockedDate, "created_at">, "apartment_id" | "reason" | "created_by">
       >;
       site_settings: TableDef<SiteSettings, SiteSettings>;
     };

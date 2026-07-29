@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { FaLocationDot, FaPhone, FaEnvelope, FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa6";
+import ContactForm from "@/components/ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -79,52 +80,9 @@ export default function ContactPage() {
 
           <div className="rounded-2xl bg-white p-10 shadow-sm">
             <h3 className="font-display text-2xl text-ink">Send Us a Message</h3>
-            <p className="mt-3 rounded-xl bg-sand p-4 text-sm text-ink-muted">
-              The contact form connects in the next build phase. In the meantime, please reach us
-              directly by phone, WhatsApp, or email above.
-            </p>
-
-            <form className="mt-6 space-y-5">
-              <div className="grid gap-5 sm:grid-cols-2">
-                <input
-                  type="text"
-                  placeholder="Your Name"
-                  disabled
-                  className="rounded-lg border border-hairline bg-sand/50 px-4 py-3 text-ink-muted"
-                />
-                <input
-                  type="email"
-                  placeholder="Your Email"
-                  disabled
-                  className="rounded-lg border border-hairline bg-sand/50 px-4 py-3 text-ink-muted"
-                />
-              </div>
-              <select
-                disabled
-                defaultValue=""
-                className="w-full rounded-lg border border-hairline bg-sand/50 px-4 py-3 text-ink-muted"
-              >
-                <option value="" disabled>
-                  Subject of Inquiry
-                </option>
-                <option value="booking">Room Booking</option>
-                <option value="events">Events &amp; Weddings</option>
-                <option value="general">General Information</option>
-              </select>
-              <textarea
-                placeholder="Your Message"
-                rows={5}
-                disabled
-                className="w-full rounded-lg border border-hairline bg-sand/50 px-4 py-3 text-ink-muted"
-              />
-              <button
-                type="button"
-                disabled
-                className="w-full cursor-not-allowed rounded-full bg-terracotta/50 px-6 py-3 font-medium text-white"
-              >
-                Send Message (Coming Soon)
-              </button>
-            </form>
+            <div className="mt-6">
+              <ContactForm />
+            </div>
           </div>
         </div>
       </section>

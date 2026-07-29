@@ -36,3 +36,18 @@ body {
   color: var(--color-sand-deep);
 }
 
+/* react-day-picker (BookingWidget) — shrink day cells so the calendar fits
+   inside the narrow booking sidebar/mobile width instead of forcing the
+   whole page to scroll horizontally at the default 44px cell size. */
+.dp-wrap {
+  --rdp-day-width: 1.85rem;
+  --rdp-day-height: 1.85rem;
+  --rdp-nav-height: 1.85rem;
+  --rdp-accent-color: var(--color-terracotta);
+  --rdp-accent-background-color: color-mix(in srgb, var(--color-terracotta) 15%, white);
+  --rdp-today-color: var(--color-ocean);
+}
+.dp-wrap .rdp-root {
+  width: 100%;
+}
+
