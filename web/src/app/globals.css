@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  /* Coastal holiday-home palette — muted evolution of the original
+     terracotta/ocean-blue identity (--primary/--secondary in the old styles.css) */
+  --color-sand: #f6f1e9;
+  --color-sand-deep: #efe6d8;
+  --color-terracotta: #c1694f;
+  --color-terracotta-hover: #a8543d;
+  --color-terracotta-dark: #8c4433;
+  --color-ocean: #2c6e6b;
+  --color-ocean-hover: #235957;
+  --color-ink: #26241f;
+  --color-ink-muted: #6b6459;
+  --color-hairline: #e2d9c8;
+}
+
+/* next/font sets --font-inter / --font-playfair via a className on <html> at
+   runtime, so these have to stay indirect (inline) rather than literal values. */
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-playfair);
+}
+
+body {
+  background: var(--color-sand);
+  color: var(--color-ink);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Thin wave-line section divider, used between alternating sand/white sections */
+.wave-divider {
+  display: block;
+  width: 100%;
+  height: 32px;
+  color: var(--color-sand-deep);
+}
+
