@@ -1,7 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import ApartmentCard from "@/components/ApartmentCard";
+import { getFeaturedApartments } from "@/lib/apartments";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const featured = await getFeaturedApartments(3);
+
   return (
     <>
       <section className="relative flex h-screen min-h-[600px] items-center justify-center bg-cover bg-center">
@@ -43,26 +47,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-white py-20 text-center">
-        <div className="mx-auto max-w-2xl px-6">
-          <h2 className="font-display text-3xl font-medium text-ink md:text-4xl">
-            Rebuilding, Room by Room
-          </h2>
-          <p className="mt-6 text-lg leading-relaxed text-ink-muted">
-            This is the new Siriba Resort site taking shape — the coastal design system is
-            live on this page and the{" "}
-            <Link href="/about" className="text-ocean underline underline-offset-4">
-              About
-            </Link>{" "}
-            and{" "}
-            <Link href="/amenities" className="text-ocean underline underline-offset-4">
-              Amenities
-            </Link>{" "}
-            pages. Apartment listings, live availability, and bookings connect once the data
-            layer is wired up.
-          </p>
-        </div>
-      </section>
+      {featured.length > 0 && (
+        <section className="bg-white py-20">
+          <div className="mx-auto max-w-7xl px-6">
+            <div className="mb-12 text-center">
+              <h2 className="font-display text-3xl font-medium text-ink md:text-4xl">
+                Our Favorite Stays
+              </h2>
+              <p className="mt-4 text-ink-muted">
+                A closer look at some of our most-loved apartments.
+              </p>
+            </div>
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {featured.map((apartment) => (
+                <ApartmentCard key={apartment.id} apartment={apartment} />
+              ))}
+            </div>
+            <div className="mt-12 text-center">
+              <Link
+                href="/accommodation"
+                className="inline-block rounded-full border border-terracotta px-8 py-3 font-medium text-terracotta transition-colors hover:bg-terracotta hover:text-white"
+              >
+                View All Apartments
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
     </>
   );
 }
