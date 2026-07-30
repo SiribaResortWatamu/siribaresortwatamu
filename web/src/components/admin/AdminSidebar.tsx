@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaChartPie, FaKey, FaVanShuttle, FaBuilding, FaArrowRightFromBracket } from "react-icons/fa6";
+import {
+  FaChartPie,
+  FaKey,
+  FaVanShuttle,
+  FaBuilding,
+  FaCalendarDays,
+  FaGear,
+  FaArrowRightFromBracket,
+} from "react-icons/fa6";
 import { signOutAction } from "@/lib/actions/admin";
 
 const NAV_ITEMS = [
@@ -10,6 +18,8 @@ const NAV_ITEMS = [
   { href: "/admin/bookings", label: "Reservations", icon: FaKey },
   { href: "/admin/safaris", label: "Safaris", icon: FaVanShuttle },
   { href: "/admin/apartments", label: "Apartments", icon: FaBuilding },
+  { href: "/admin/calendar", label: "Calendar", icon: FaCalendarDays },
+  { href: "/admin/settings", label: "Settings", icon: FaGear },
 ];
 
 export default function AdminSidebar() {

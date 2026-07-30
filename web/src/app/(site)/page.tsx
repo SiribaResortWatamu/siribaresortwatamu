@@ -2,9 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import ApartmentCard from "@/components/ApartmentCard";
 import { getFeaturedApartments } from "@/lib/apartments";
+import { getSiteSettings } from "@/lib/site-settings";
 
 export default async function HomePage() {
-  const featured = await getFeaturedApartments(3);
+  const [featured, settings] = await Promise.all([getFeaturedApartments(3), getSiteSettings()]);
 
   return (
     <>
@@ -60,7 +61,7 @@ export default async function HomePage() {
             </div>
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {featured.map((apartment) => (
-                <ApartmentCard key={apartment.id} apartment={apartment} />
+                <ApartmentCard key={apartment.id} apartment={apartment} showPrices={settings.show_prices} />
               ))}
             </div>
             <div className="mt-12 text-center">

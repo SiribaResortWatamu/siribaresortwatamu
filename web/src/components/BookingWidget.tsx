@@ -9,6 +9,7 @@ type Props = {
   apartmentId: string;
   apartmentName: string;
   pricePerNight: number;
+  showPrices?: boolean;
 };
 
 type Status = "idle" | "submitting" | "success" | "error";
@@ -23,7 +24,12 @@ function formatDisplay(d: Date | undefined) {
   return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
-export default function BookingWidget({ apartmentId, apartmentName, pricePerNight }: Props) {
+export default function BookingWidget({
+  apartmentId,
+  apartmentName,
+  pricePerNight,
+  showPrices = true,
+}: Props) {
   const [disabledRanges, setDisabledRanges] = useState<DateRange[]>([]);
   const [loadingAvailability, setLoadingAvailability] = useState(true);
   const [range, setRange] = useState<DateRange | undefined>();
@@ -163,9 +169,11 @@ export default function BookingWidget({ apartmentId, apartmentName, pricePerNigh
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="text-ink-muted">
-        From <span className="font-display text-3xl text-terracotta">${pricePerNight}</span> / night
-      </div>
+      {showPrices && (
+        <div className="text-ink-muted">
+          From <span className="font-display text-3xl text-terracotta">${pricePerNight}</span> / night
+        </div>
+      )}
 
       <div className="relative" ref={calendarRef}>
         <div className="grid grid-cols-2 overflow-hidden rounded-xl border border-hairline">
@@ -208,7 +216,7 @@ export default function BookingWidget({ apartmentId, apartmentName, pricePerNigh
         )}
       </div>
 
-      {nights > 0 && (
+      {showPrices && nights > 0 && (
         <div className="rounded-lg bg-sand p-4 text-sm text-ink-muted">
           <div className="flex justify-between">
             <span>

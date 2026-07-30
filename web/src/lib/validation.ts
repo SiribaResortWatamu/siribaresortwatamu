@@ -60,3 +60,17 @@ export const apartmentInputSchema = z.object({
 });
 
 export type ApartmentInput = z.infer<typeof apartmentInputSchema>;
+
+export const blockedDateInputSchema = z
+  .object({
+    apartmentId: z.string().uuid().nullable(),
+    startDate: z.string().date(),
+    endDate: z.string().date(),
+    reason: z.string().trim().max(300).optional(),
+  })
+  .refine((data) => data.endDate >= data.startDate, {
+    message: "End date must be on or after the start date",
+    path: ["endDate"],
+  });
+
+export type BlockedDateInput = z.infer<typeof blockedDateInputSchema>;

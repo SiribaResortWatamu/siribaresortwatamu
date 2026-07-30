@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Booking, SafariBooking } from "@/lib/supabase/types";
+import type { Apartment, BlockedDate, Booking, SafariBooking } from "@/lib/supabase/types";
 
 export type BookingWithApartment = Booking & { apartments: { name: string } | null };
+export type BlockedDateWithApartment = BlockedDate & { apartments: { name: string } | null };
 
 export async function getAllBookings(): Promise<BookingWithApartment[]> {
   const supabase = await createClient();
@@ -20,6 +21,29 @@ export async function getAllSafariBookings(): Promise<SafariBooking[]> {
     .from("safari_bookings")
     .select("*")
     .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function getAllBlockedDates(): Promise<BlockedDateWithApartment[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("blocked_dates")
+    .select("*, apartments(name)")
+    .order("start_date", { ascending: true });
+
+  if (error) throw error;
+  return (data ?? []) as unknown as BlockedDateWithApartment[];
+}
+
+export async function getAllApartmentsForAdmin(): Promise<Pick<Apartment, "id" | "name">[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("apartments")
+    .select("id, name")
+    .eq("is_archived", false)
+    .order("sort_order", { ascending: true });
 
   if (error) throw error;
   return data ?? [];

@@ -11,6 +11,7 @@ import {
   getRelatedApartments,
   galleryImages,
 } from "@/lib/apartments";
+import { getSiteSettings } from "@/lib/site-settings";
 
 type Params = Promise<{ slug: string }>;
 
@@ -46,7 +47,10 @@ export default async function RoomDetailsPage({ params }: { params: Params }) {
   if (!apartment) notFound();
 
   const images = galleryImages(apartment);
-  const related = await getRelatedApartments(slug, 3);
+  const [related, settings] = await Promise.all([
+    getRelatedApartments(slug, 3),
+    getSiteSettings(),
+  ]);
 
   return (
     <>
@@ -97,6 +101,7 @@ export default async function RoomDetailsPage({ params }: { params: Params }) {
               apartmentId={apartment.id}
               apartmentName={apartment.name}
               pricePerNight={apartment.price_usd}
+              showPrices={settings.show_prices}
             />
           </aside>
         </div>
@@ -110,7 +115,7 @@ export default async function RoomDetailsPage({ params }: { params: Params }) {
             </h2>
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((r) => (
-                <ApartmentCard key={r.id} apartment={r} />
+                <ApartmentCard key={r.id} apartment={r} showPrices={settings.show_prices} />
               ))}
             </div>
           </div>

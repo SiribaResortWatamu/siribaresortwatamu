@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Apartment, ApartmentPhoto } from "@/lib/supabase/types";
+import { publicPhotoUrl } from "@/lib/photo-url";
 
 export const FALLBACK_APARTMENT_IMAGE = "/images/room.png";
 
@@ -63,14 +64,6 @@ export async function getRelatedApartments(
 ): Promise<ApartmentWithPhotos[]> {
   const apartments = await getActiveApartments();
   return apartments.filter((a) => a.slug !== excludeSlug).slice(0, limit);
-}
-
-const PHOTOS_BUCKET = "apartment-photos";
-
-// Storage public URLs are deterministic, so no need for an async
-// storage.from(bucket).getPublicUrl() round-trip per image.
-function publicPhotoUrl(storagePath: string): string {
-  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${PHOTOS_BUCKET}/${storagePath}`;
 }
 
 export function coverImage(apartment: ApartmentWithPhotos): string {

@@ -3,7 +3,13 @@ import Link from "next/link";
 import { FaBed, FaBath, FaUserGroup } from "react-icons/fa6";
 import { coverImage, type ApartmentWithPhotos } from "@/lib/apartments";
 
-export default function ApartmentCard({ apartment }: { apartment: ApartmentWithPhotos }) {
+export default function ApartmentCard({
+  apartment,
+  showPrices = true,
+}: {
+  apartment: ApartmentWithPhotos;
+  showPrices?: boolean;
+}) {
   return (
     <div className="group overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
       <Link href={`/accommodation/${apartment.slug}`} className="block">
@@ -32,9 +38,11 @@ export default function ApartmentCard({ apartment }: { apartment: ApartmentWithP
           </span>
         </div>
 
-        <div className="mt-5 text-ink-muted">
-          From <span className="font-display text-2xl text-terracotta">${apartment.price_usd}</span> / night
-        </div>
+        {showPrices && (
+          <div className="mt-5 text-ink-muted">
+            From <span className="font-display text-2xl text-terracotta">${apartment.price_usd}</span> / night
+          </div>
+        )}
 
         <div className="mt-6 flex gap-3">
           <Link
