@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type PageHeroProps = {
   title: string;
   image: string;
@@ -6,10 +8,8 @@ type PageHeroProps = {
 
 export default function PageHero({ title, image, subtitle }: PageHeroProps) {
   return (
-    <div
-      className="relative flex h-[55vh] min-h-[380px] items-center justify-center bg-cover bg-center"
-      style={{ backgroundImage: `url('${image}')` }}
-    >
+    <div className="relative flex h-[55vh] min-h-[380px] items-center justify-center overflow-hidden">
+      <Image src={image} alt="" fill priority sizes="100vw" className="object-cover" />
       <div className="absolute inset-0 bg-ink/45" />
       <div className="relative text-center text-white">
         <h1 className="font-display text-4xl font-semibold tracking-wide md:text-6xl">

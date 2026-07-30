@@ -17,6 +17,8 @@ type ApartmentFormValues = {
   feature_on_homepage: boolean;
   sort_order: number;
   features: ApartmentFeature[];
+  seo_title: string;
+  seo_description: string;
 };
 
 function slugify(value: string) {
@@ -38,6 +40,8 @@ const emptyValues: ApartmentFormValues = {
   feature_on_homepage: false,
   sort_order: 0,
   features: [],
+  seo_title: "",
+  seo_description: "",
 };
 
 export default function ApartmentForm({
@@ -260,6 +264,42 @@ export default function ApartmentForm({
               </button>
             </div>
           ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="mb-1 text-sm font-semibold text-ink">SEO</h3>
+        <p className="mb-3 text-xs text-ink-muted">
+          Optional overrides for this apartment&apos;s page title and search-result snippet. Leave
+          blank to fall back to the name and description above.
+        </p>
+        <div className="space-y-3">
+          <div>
+            <div className="mb-1 flex items-center justify-between">
+              <label className="text-sm font-medium text-ink">SEO Title</label>
+              <span className="text-xs text-ink-muted">{values.seo_title.length}/60</span>
+            </div>
+            <input
+              type="text"
+              placeholder={values.name || "Defaults to the apartment name"}
+              value={values.seo_title}
+              onChange={(e) => set("seo_title", e.target.value)}
+              className="w-full rounded-lg border border-hairline px-3 py-2"
+            />
+          </div>
+          <div>
+            <div className="mb-1 flex items-center justify-between">
+              <label className="text-sm font-medium text-ink">SEO Description</label>
+              <span className="text-xs text-ink-muted">{values.seo_description.length}/160</span>
+            </div>
+            <textarea
+              rows={2}
+              placeholder={values.description || "Defaults to the apartment description"}
+              value={values.seo_description}
+              onChange={(e) => set("seo_description", e.target.value)}
+              className="w-full rounded-lg border border-hairline px-3 py-2"
+            />
+          </div>
         </div>
       </div>
 

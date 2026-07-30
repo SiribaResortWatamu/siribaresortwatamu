@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { validateName, validateEmail, validateFreeText } from "@/lib/client-validation";
 
 type Props = {
   safariPackageId: string;
@@ -8,6 +9,7 @@ type Props = {
 };
 
 type Status = "idle" | "submitting" | "success" | "error";
+type FieldName = "name" | "email" | "notes";
 
 export default function SafariEnquiryWidget({ safariPackageId, safariName }: Props) {
   const [form, setForm] = useState({
@@ -18,11 +20,34 @@ export default function SafariEnquiryWidget({ safariPackageId, safariName }: Pro
     children: 0,
     notes: "",
   });
+  const [touched, setTouched] = useState<Partial<Record<FieldName, boolean>>>({});
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const fieldErrors: Record<FieldName, string | null> = {
+    name: validateName(form.name),
+    email: validateEmail(form.email),
+    notes: validateFreeText(form.notes, { maxLength: 2000 }),
+  };
+
+  function markTouched(field: FieldName) {
+    setTouched((t) => ({ ...t, [field]: true }));
+  }
+
+  function errorFor(field: FieldName) {
+    return touched[field] ? fieldErrors[field] : null;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setTouched({ name: true, email: true, notes: true });
+
+    if (Object.values(fieldErrors).some(Boolean)) {
+      setErrorMessage("Please fix the highlighted fields.");
+      setStatus("error");
+      return;
+    }
+
     setStatus("submitting");
     setErrorMessage("");
 
@@ -35,9 +60,9 @@ export default function SafariEnquiryWidget({ safariPackageId, safariName }: Pro
           travelDate: form.travelDate || undefined,
           adults: form.adults,
           children: form.children,
-          guestName: form.name,
-          guestEmail: form.email,
-          notes: form.notes || undefined,
+          guestName: form.name.trim(),
+          guestEmail: form.email.trim(),
+          notes: form.notes.trim() || undefined,
         }),
       });
 
@@ -64,25 +89,34 @@ export default function SafariEnquiryWidget({ safariPackageId, safariName }: Pro
     );
   }
 
+  const inputClass = (field: FieldName) =>
+    `rounded-lg border px-3 py-2 text-sm ${errorFor(field) ? "border-red-400" : "border-hairline"}`;
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <input
-          type="text"
-          required
-          placeholder="Full Name"
-          value={form.name}
-          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-          className="rounded-lg border border-hairline px-3 py-2 text-sm"
-        />
-        <input
-          type="email"
-          required
-          placeholder="Email"
-          value={form.email}
-          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-          className="rounded-lg border border-hairline px-3 py-2 text-sm"
-        />
+        <div>
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={form.name}
+            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            onBlur={() => markTouched("name")}
+            className={`w-full ${inputClass("name")}`}
+          />
+          {errorFor("name") && <p className="mt-1 text-xs text-red-600">{errorFor("name")}</p>}
+        </div>
+        <div>
+          <input
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+            onBlur={() => markTouched("email")}
+            className={`w-full ${inputClass("email")}`}
+          />
+          {errorFor("email") && <p className="mt-1 text-xs text-red-600">{errorFor("email")}</p>}
+        </div>
       </div>
       <div className="grid gap-4 sm:grid-cols-3">
         <input
@@ -111,13 +145,17 @@ export default function SafariEnquiryWidget({ safariPackageId, safariName }: Pro
           placeholder="Children"
         />
       </div>
-      <textarea
-        placeholder="Anything else we should know? (optional)"
-        rows={3}
-        value={form.notes}
-        onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-        className="w-full rounded-lg border border-hairline px-3 py-2 text-sm"
-      />
+      <div>
+        <textarea
+          placeholder="Anything else we should know? (optional)"
+          rows={3}
+          value={form.notes}
+          onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+          onBlur={() => markTouched("notes")}
+          className={`w-full ${inputClass("notes")}`}
+        />
+        {errorFor("notes") && <p className="mt-1 text-xs text-red-600">{errorFor("notes")}</p>}
+      </div>
 
       {status === "error" && <p className="text-sm text-red-600">{errorMessage}</p>}
 

@@ -80,6 +80,8 @@ export async function createApartment(input: ApartmentInput): Promise<ActionResu
     bathrooms: data.bathrooms,
     feature_on_homepage: data.feature_on_homepage,
     sort_order: data.sort_order ?? (maxOrderRow?.sort_order ?? 0) + 1,
+    seo_title: data.seo_title || null,
+    seo_description: data.seo_description || null,
   });
 
   if (error) return { ok: false, error: error.message };
@@ -110,6 +112,8 @@ export async function updateApartment(id: string, input: ApartmentInput): Promis
       bedrooms: data.bedrooms,
       bathrooms: data.bathrooms,
       feature_on_homepage: data.feature_on_homepage,
+      seo_title: data.seo_title || null,
+      seo_description: data.seo_description || null,
       ...(data.sort_order !== undefined ? { sort_order: data.sort_order } : {}),
       updated_at: new Date().toISOString(),
     })

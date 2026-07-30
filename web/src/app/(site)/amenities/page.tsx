@@ -60,7 +60,14 @@ export default function AmenitiesPage() {
             }`}
           >
             <div className="relative h-[280px] w-full overflow-hidden rounded-2xl md:h-[360px] md:flex-1">
-              <Image src={item.image} alt={item.title} fill className="object-cover" />
+              <Image
+                src={item.image}
+                alt={item.title}
+                fill
+                loading={i === 0 ? "eager" : "lazy"}
+                sizes="(min-width: 768px) 50vw, 100vw"
+                className="object-cover"
+              />
             </div>
             <div className="md:flex-1">
               <h2 className="font-display text-3xl font-medium text-ink">

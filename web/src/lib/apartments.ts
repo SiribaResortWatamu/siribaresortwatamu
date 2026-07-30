@@ -71,7 +71,15 @@ export function coverImage(apartment: ApartmentWithPhotos): string {
   return cover ? publicPhotoUrl(cover.storage_path) : FALLBACK_APARTMENT_IMAGE;
 }
 
+// Cover photo always leads the gallery — it's what room-details uses as the
+// page header image, so "first uploaded photo" (which becomes the cover by
+// default) has to actually render first regardless of its `order` value,
+// and stay first if the admin later re-covers with a different photo.
 export function galleryImages(apartment: ApartmentWithPhotos): string[] {
   if (apartment.photos.length === 0) return [FALLBACK_APARTMENT_IMAGE];
-  return apartment.photos.map((p) => publicPhotoUrl(p.storage_path));
+  const sorted = [...apartment.photos].sort((a, b) => {
+    if (a.is_cover !== b.is_cover) return a.is_cover ? -1 : 1;
+    return a.order - b.order;
+  });
+  return sorted.map((p) => publicPhotoUrl(p.storage_path));
 }

@@ -40,6 +40,8 @@ export default function AboutPage() {
               src="/images/room.png"
               alt="Siriba Resort Interior"
               fill
+              loading="lazy"
+              sizes="(min-width: 768px) 50vw, 100vw"
               className="object-cover"
             />
           </div>

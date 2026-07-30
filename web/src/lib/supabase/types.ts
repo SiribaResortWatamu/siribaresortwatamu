@@ -4,6 +4,7 @@
 // Supabase CLI is linked to the project — not required to get started.)
 
 export type ApartmentFeature = { icon: string; text: string };
+export type ExternalCalendarLink = { label: string; url: string };
 
 export type Apartment = {
   id: string;
@@ -18,6 +19,9 @@ export type Apartment = {
   is_archived: boolean;
   feature_on_homepage: boolean;
   sort_order: number;
+  seo_title: string | null;
+  seo_description: string | null;
+  external_ical_urls: ExternalCalendarLink[];
   created_at: string;
   updated_at: string;
 };
@@ -98,6 +102,8 @@ export type BlockedDate = {
   end_date: string;
   reason: string | null;
   created_by: string | null;
+  external_uid: string | null; // set when synced from an external iCal feed
+  external_source: string | null; // e.g. "Airbnb" — the calendar label it came from
   created_at: string;
 };
 
@@ -150,6 +156,9 @@ export type Database = {
           | "is_archived"
           | "feature_on_homepage"
           | "sort_order"
+          | "seo_title"
+          | "seo_description"
+          | "external_ical_urls"
         >,
         UpdateOf<Apartment>
       >;
@@ -192,7 +201,10 @@ export type Database = {
       >;
       blocked_dates: TableDef<
         BlockedDate,
-        WithDefaults<Omit<BlockedDate, "created_at">, "apartment_id" | "reason" | "created_by">
+        WithDefaults<
+          Omit<BlockedDate, "created_at">,
+          "apartment_id" | "reason" | "created_by" | "external_uid" | "external_source"
+        >
       >;
       site_settings: TableDef<SiteSettings, SiteSettings>;
     };

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { DayPicker, type DateRange } from "react-day-picker";
 import "react-day-picker/style.css";
 import { createClient } from "@/lib/supabase/client";
+import { validateName, validateEmail, validatePhone, validateFreeText } from "@/lib/client-validation";
 
 type Props = {
   apartmentId: string;
@@ -13,6 +14,7 @@ type Props = {
 };
 
 type Status = "idle" | "submitting" | "success" | "error";
+type FieldName = "name" | "email" | "phone" | "requests";
 
 function toDateString(d: Date) {
   const tzOffset = d.getTimezoneOffset() * 60000;
@@ -43,8 +45,24 @@ export default function BookingWidget({
     children: 0,
     requests: "",
   });
+  const [touched, setTouched] = useState<Partial<Record<FieldName, boolean>>>({});
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const fieldErrors: Record<FieldName, string | null> = {
+    name: validateName(guest.name),
+    email: validateEmail(guest.email),
+    phone: validatePhone(guest.phone, true),
+    requests: validateFreeText(guest.requests, { maxLength: 2000 }),
+  };
+
+  function markTouched(field: FieldName) {
+    setTouched((t) => ({ ...t, [field]: true }));
+  }
+
+  function errorFor(field: FieldName) {
+    return touched[field] ? fieldErrors[field] : null;
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -117,6 +135,13 @@ export default function BookingWidget({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setTouched({ name: true, email: true, phone: true, requests: true });
+
+    if (Object.values(fieldErrors).some(Boolean)) {
+      setErrorMessage("Please fix the highlighted fields.");
+      setStatus("error");
+      return;
+    }
     if (!range?.from || !range?.to) {
       setErrorMessage("Please select your check-in and check-out dates.");
       setStatus("error");
@@ -136,10 +161,10 @@ export default function BookingWidget({
           departure: toDateString(range.to),
           adults: guest.adults,
           children: guest.children,
-          guestName: guest.name,
-          guestEmail: guest.email,
-          guestPhone: guest.phone || undefined,
-          specialRequests: guest.requests || undefined,
+          guestName: guest.name.trim(),
+          guestEmail: guest.email.trim(),
+          guestPhone: guest.phone.trim(),
+          specialRequests: guest.requests.trim() || undefined,
         }),
       });
 
@@ -167,8 +192,13 @@ export default function BookingWidget({
     );
   }
 
+  const inputClass = (field: FieldName) =>
+    `w-full rounded-lg border px-3 py-2 text-sm ${
+      errorFor(field) ? "border-red-400" : "border-hairline"
+    }`;
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} noValidate className="space-y-5">
       {showPrices && (
         <div className="text-ink-muted">
           From <span className="font-display text-3xl text-terracotta">${pricePerNight}</span> / night
@@ -248,36 +278,53 @@ export default function BookingWidget({
         />
       </div>
 
-      <input
-        type="text"
-        required
-        placeholder="Full Name"
-        value={guest.name}
-        onChange={(e) => setGuest((g) => ({ ...g, name: e.target.value }))}
-        className="w-full rounded-lg border border-hairline px-3 py-2 text-sm"
-      />
-      <input
-        type="email"
-        required
-        placeholder="Email"
-        value={guest.email}
-        onChange={(e) => setGuest((g) => ({ ...g, email: e.target.value }))}
-        className="w-full rounded-lg border border-hairline px-3 py-2 text-sm"
-      />
-      <input
-        type="tel"
-        placeholder="Phone (optional)"
-        value={guest.phone}
-        onChange={(e) => setGuest((g) => ({ ...g, phone: e.target.value }))}
-        className="w-full rounded-lg border border-hairline px-3 py-2 text-sm"
-      />
-      <textarea
-        placeholder="Special requests (optional)"
-        rows={3}
-        value={guest.requests}
-        onChange={(e) => setGuest((g) => ({ ...g, requests: e.target.value }))}
-        className="w-full rounded-lg border border-hairline px-3 py-2 text-sm"
-      />
+      <div>
+        <input
+          type="text"
+          placeholder="Full Name"
+          value={guest.name}
+          onChange={(e) => setGuest((g) => ({ ...g, name: e.target.value }))}
+          onBlur={() => markTouched("name")}
+          className={inputClass("name")}
+        />
+        {errorFor("name") && <p className="mt-1 text-xs text-red-600">{errorFor("name")}</p>}
+      </div>
+
+      <div>
+        <input
+          type="email"
+          placeholder="Email"
+          value={guest.email}
+          onChange={(e) => setGuest((g) => ({ ...g, email: e.target.value }))}
+          onBlur={() => markTouched("email")}
+          className={inputClass("email")}
+        />
+        {errorFor("email") && <p className="mt-1 text-xs text-red-600">{errorFor("email")}</p>}
+      </div>
+
+      <div>
+        <input
+          type="tel"
+          placeholder="Phone"
+          value={guest.phone}
+          onChange={(e) => setGuest((g) => ({ ...g, phone: e.target.value }))}
+          onBlur={() => markTouched("phone")}
+          className={inputClass("phone")}
+        />
+        {errorFor("phone") && <p className="mt-1 text-xs text-red-600">{errorFor("phone")}</p>}
+      </div>
+
+      <div>
+        <textarea
+          placeholder="Special requests (optional)"
+          rows={3}
+          value={guest.requests}
+          onChange={(e) => setGuest((g) => ({ ...g, requests: e.target.value }))}
+          onBlur={() => markTouched("requests")}
+          className={inputClass("requests")}
+        />
+        {errorFor("requests") && <p className="mt-1 text-xs text-red-600">{errorFor("requests")}</p>}
+      </div>
 
       {status === "error" && <p className="text-sm text-red-600">{errorMessage}</p>}
 

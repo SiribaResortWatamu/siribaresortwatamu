@@ -10,6 +10,7 @@ import {
   getApartmentBySlug,
   getRelatedApartments,
   galleryImages,
+  coverImage,
 } from "@/lib/apartments";
 import { getSiteSettings } from "@/lib/site-settings";
 
@@ -38,7 +39,29 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { slug } = await params;
   const apartment = await getApartmentBySlug(slug);
   if (!apartment) return { title: "Apartment Not Found" };
-  return { title: apartment.name, description: apartment.description };
+
+  const title = apartment.seo_title || apartment.name;
+  const description = apartment.seo_description || apartment.description;
+  const image = coverImage(apartment);
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/accommodation/${apartment.slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `/accommodation/${apartment.slug}`,
+      images: [{ url: image }],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+  };
 }
 
 export default async function RoomDetailsPage({ params }: { params: Params }) {
@@ -60,12 +83,22 @@ export default async function RoomDetailsPage({ params }: { params: Params }) {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
           <div className="min-w-0 lg:col-span-2">
             {images.length > 1 && (
-              <div className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {images.map((src, i) => (
-                  <div key={src + i} className="relative h-32 overflow-hidden rounded-xl sm:h-40">
-                    <Image src={src} alt={`${apartment.name} photo ${i + 1}`} fill className="object-cover" />
-                  </div>
-                ))}
+              <div className="mb-10">
+                <h2 className="mb-4 font-display text-2xl text-ink">Gallery</h2>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {images.map((src, i) => (
+                    <div key={src + i} className="relative h-32 overflow-hidden rounded-xl sm:h-40">
+                      <Image
+                        src={src}
+                        alt={`${apartment.name} photo ${i + 1}`}
+                        fill
+                        loading={i === 0 ? "eager" : "lazy"}
+                        sizes="(min-width: 1024px) 260px, (min-width: 640px) 33vw, 50vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 

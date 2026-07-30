@@ -15,6 +15,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3100"),
   title: {
     default: "Siriba Resort Watamu | Coastal Luxury Apartments",
     template: "%s | Siriba Resort Watamu",
