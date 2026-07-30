@@ -129,6 +129,12 @@ type TableDef<Row, Insert, Update = Partial<Insert>> = {
 type WithDefaults<T, DefaultedKeys extends keyof T> = Omit<T, DefaultedKeys | "id"> &
   Partial<Pick<T, DefaultedKeys>> & { id?: string };
 
+// Updates are realistically always partial patches — any column except id/
+// created_at can be included or left out, independent of what Insert allows.
+type UpdateOf<Row, Omitted extends keyof Row = never> = Partial<
+  Omit<Row, "id" | "created_at" | Omitted>
+>;
+
 export type Database = {
   public: {
     Tables: {
@@ -144,7 +150,8 @@ export type Database = {
           | "is_archived"
           | "feature_on_homepage"
           | "sort_order"
-        >
+        >,
+        UpdateOf<Apartment>
       >;
       apartment_photos: TableDef<
         ApartmentPhoto,
@@ -161,14 +168,16 @@ export type Database = {
           | "status"
           | "payment_status"
           | "source"
-        >
+        >,
+        UpdateOf<Booking, "nights">
       >;
       safari_packages: TableDef<
         SafariPackage,
         WithDefaults<
           Omit<SafariPackage, "created_at" | "updated_at">,
           "description" | "duration_label" | "price_usd" | "images" | "is_archived" | "sort_order"
-        >
+        >,
+        UpdateOf<SafariPackage>
       >;
       safari_bookings: TableDef<
         SafariBooking,

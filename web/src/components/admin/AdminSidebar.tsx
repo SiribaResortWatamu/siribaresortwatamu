@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaChartPie, FaKey, FaVanShuttle, FaArrowRightFromBracket } from "react-icons/fa6";
+import { FaChartPie, FaKey, FaVanShuttle, FaBuilding, FaArrowRightFromBracket } from "react-icons/fa6";
 import { signOutAction } from "@/lib/actions/admin";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "Overview", icon: FaChartPie },
   { href: "/admin/bookings", label: "Reservations", icon: FaKey },
   { href: "/admin/safaris", label: "Safaris", icon: FaVanShuttle },
+  { href: "/admin/apartments", label: "Apartments", icon: FaBuilding },
 ];
 
 export default function AdminSidebar() {
@@ -23,7 +24,7 @@ export default function AdminSidebar() {
 
       <nav className="flex-1 py-6">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href;
+          const active = href === "/admin" ? pathname === href : pathname.startsWith(href);
           return (
             <Link
               key={href}

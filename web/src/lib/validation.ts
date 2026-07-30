@@ -40,3 +40,23 @@ export const contactRequestSchema = z.object({
 });
 
 export type ContactRequest = z.infer<typeof contactRequestSchema>;
+
+export const apartmentFeatureSchema = z.object({
+  icon: z.string().trim().min(1).max(50),
+  text: z.string().trim().min(1).max(200),
+});
+
+export const apartmentInputSchema = z.object({
+  name: z.string().trim().min(1).max(200),
+  slug: z.string().trim().max(100).optional(),
+  description: z.string().trim().max(3000).default(""),
+  price_usd: z.coerce.number().min(0),
+  guests: z.coerce.number().int().min(1).max(50),
+  bedrooms: z.coerce.number().int().min(0).max(20),
+  bathrooms: z.coerce.number().int().min(0).max(20),
+  feature_on_homepage: z.boolean().default(false),
+  sort_order: z.coerce.number().int().optional(),
+  features: z.array(apartmentFeatureSchema).max(30).default([]),
+});
+
+export type ApartmentInput = z.infer<typeof apartmentInputSchema>;

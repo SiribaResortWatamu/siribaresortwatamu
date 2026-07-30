@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DayPicker, type DateRange } from "react-day-picker";
 import "react-day-picker/style.css";
 import { createClient } from "@/lib/supabase/client";
@@ -18,10 +18,17 @@ function toDateString(d: Date) {
   return new Date(d.getTime() - tzOffset).toISOString().slice(0, 10);
 }
 
+function formatDisplay(d: Date | undefined) {
+  if (!d) return null;
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
 export default function BookingWidget({ apartmentId, apartmentName, pricePerNight }: Props) {
   const [disabledRanges, setDisabledRanges] = useState<DateRange[]>([]);
   const [loadingAvailability, setLoadingAvailability] = useState(true);
   const [range, setRange] = useState<DateRange | undefined>();
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const calendarRef = useRef<HTMLDivElement>(null);
   const [guest, setGuest] = useState({
     name: "",
     email: "",
@@ -73,6 +80,18 @@ export default function BookingWidget({ apartmentId, apartmentName, pricePerNigh
     };
   }, [apartmentId]);
 
+  // Close the calendar popover on an outside click.
+  useEffect(() => {
+    if (!calendarOpen) return;
+    function onClickOutside(e: MouseEvent) {
+      if (calendarRef.current && !calendarRef.current.contains(e.target as Node)) {
+        setCalendarOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [calendarOpen]);
+
   const nights = useMemo(() => {
     if (!range?.from || !range?.to) return 0;
     return Math.round((range.to.getTime() - range.from.getTime()) / 86400000);
@@ -80,10 +99,20 @@ export default function BookingWidget({ apartmentId, apartmentName, pricePerNigh
 
   const total = nights * pricePerNight;
 
+  function handleSelectRange(next: DateRange | undefined) {
+    setRange(next);
+    // react-day-picker sets {from: day, to: day} on the very first click, so
+    // "both ends are set" alone isn't "the user is done" — only close once
+    // from/to are genuinely different days (a real 1+ night stay).
+    if (next?.from && next?.to && next.to.getTime() !== next.from.getTime()) {
+      setCalendarOpen(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!range?.from || !range?.to) {
-      setErrorMessage("Please select your arrival and departure dates.");
+      setErrorMessage("Please select your check-in and check-out dates.");
       setStatus("error");
       return;
     }
@@ -138,19 +167,46 @@ export default function BookingWidget({ apartmentId, apartmentName, pricePerNigh
         From <span className="font-display text-3xl text-terracotta">${pricePerNight}</span> / night
       </div>
 
-      {loadingAvailability ? (
-        <p className="text-sm text-ink-muted">Loading availability&hellip;</p>
-      ) : (
-        <div className="dp-wrap overflow-x-auto rounded-xl border border-hairline bg-white p-3">
-          <DayPicker
-            mode="range"
-            selected={range}
-            onSelect={setRange}
-            disabled={[{ before: new Date() }, ...disabledRanges]}
-            numberOfMonths={1}
-          />
+      <div className="relative" ref={calendarRef}>
+        <div className="grid grid-cols-2 overflow-hidden rounded-xl border border-hairline">
+          <button
+            type="button"
+            onClick={() => setCalendarOpen(true)}
+            className="border-r border-hairline px-3 py-2.5 text-left transition-colors hover:bg-sand"
+          >
+            <span className="block text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+              Check-in
+            </span>
+            <span className="text-sm text-ink">{formatDisplay(range?.from) ?? "Add date"}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setCalendarOpen(true)}
+            className="px-3 py-2.5 text-left transition-colors hover:bg-sand"
+          >
+            <span className="block text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+              Check-out
+            </span>
+            <span className="text-sm text-ink">{formatDisplay(range?.to) ?? "Add date"}</span>
+          </button>
         </div>
-      )}
+
+        {calendarOpen && (
+          <div className="dp-wrap absolute z-20 mt-2 w-full min-w-[280px] overflow-x-auto rounded-xl border border-hairline bg-white p-3 shadow-lg">
+            {loadingAvailability ? (
+              <p className="p-2 text-sm text-ink-muted">Loading availability&hellip;</p>
+            ) : (
+              <DayPicker
+                mode="range"
+                selected={range}
+                onSelect={handleSelectRange}
+                disabled={[{ before: new Date() }, ...disabledRanges]}
+                numberOfMonths={1}
+              />
+            )}
+          </div>
+        )}
+      </div>
 
       {nights > 0 && (
         <div className="rounded-lg bg-sand p-4 text-sm text-ink-muted">
