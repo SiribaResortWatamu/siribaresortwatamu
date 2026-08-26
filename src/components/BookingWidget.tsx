@@ -21,6 +21,18 @@ function toDateString(d: Date) {
   return new Date(d.getTime() - tzOffset).toISOString().slice(0, 10);
 }
 
+// The read-side counterpart of toDateString. `new Date("2026-08-01")` parses
+// a date-only string as UTC midnight, which resolves to the *previous* day
+// for any guest west of UTC — so the calendar would grey out the wrong
+// nights and leave a genuinely booked one selectable. Building from the
+// parts gives local midnight, matching how toDateString serialises. The day
+// offset goes through the constructor so month/DST rollover is handled for
+// us (unlike subtracting 86400000ms).
+function parseDateOnly(value: string, dayOffset = 0) {
+  const [y, m, d] = value.split("-").map(Number);
+  return new Date(y, m - 1, d + dayOffset);
+}
+
 function formatDisplay(d: Date | undefined) {
   if (!d) return null;
   return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
@@ -84,13 +96,14 @@ export default function BookingWidget({
 
       const ranges: DateRange[] = [
         ...(blocked.data ?? []).map((b) => ({
-          from: new Date(b.start_date),
-          to: new Date(b.end_date),
+          from: parseDateOnly(b.start_date),
+          // stored inclusive — the last unavailable night
+          to: parseDateOnly(b.end_date),
         })),
         ...(booked.data ?? []).map((b) => ({
-          from: new Date(b.start_date),
+          from: parseDateOnly(b.start_date),
           // stored as an exclusive end (checkout day is bookable again)
-          to: new Date(new Date(b.end_date).getTime() - 86400000),
+          to: parseDateOnly(b.end_date, -1),
         })),
       ];
 

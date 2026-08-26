@@ -11,6 +11,21 @@ export type SyncResult = {
   error?: string;
 };
 
+// `blocked_dates.end_date` is INCLUSIVE (the last unavailable night) —
+// that's what every reader assumes: the export route in
+// app/api/ical/[slug] adds a day to turn it back into an exclusive DTEND,
+// and BookingWidget disables through it. Parsed iCal events carry an
+// EXCLUSIVE end (RFC 5545 DTEND = the checkout day, which is bookable
+// again), so the boundary has to be converted here rather than leaving two
+// different meanings in the same column.
+function exclusiveEndToInclusive(startDate: string, endDate: string): string {
+  const [y, m, d] = endDate.split("-").map(Number);
+  const shifted = new Date(Date.UTC(y, m - 1, d - 1)).toISOString().slice(0, 10);
+  // A zero-length event would shift to before its own start and trip the
+  // end_after_start check constraint — clamp it to a single blocked night.
+  return shifted < startDate ? startDate : shifted;
+}
+
 // Pulls one external calendar (Airbnb/Booking.com "export" URL) and
 // upserts it into blocked_dates, keyed by (apartment_id, external_uid) so
 // re-running is idempotent. Removes any previously-synced block from this
@@ -44,7 +59,7 @@ export async function syncOneCalendar(
       {
         apartment_id: apartmentId,
         start_date: event.start,
-        end_date: event.end,
+        end_date: exclusiveEndToInclusive(event.start, event.end),
         reason: `Synced from ${calendar.label}`,
         external_uid: event.uid,
         external_source: calendar.label,
