@@ -82,7 +82,7 @@ export async function GET(request: Request) {
       ],
       body: [
         settings?.arrival_information ??
-          "We are on Watamu Beach Road. Send us your arrival time and we will meet you at the gate.",
+          "Send us your arrival time and we will meet you at the gate.",
         settings?.address
           ? `Our address: ${settings.address}`
           : "Message us on WhatsApp if you need directions on the day.",

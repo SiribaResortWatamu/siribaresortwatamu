@@ -90,7 +90,7 @@ export function ApartmentForm({
                   name="location"
                   className="input"
                   defaultValue={apartment?.location ?? ""}
-                  placeholder="Watamu Beach Road"
+                  placeholder="Jacaranda Road, Watamu"
                 />
               </AdminField>
             </div>
