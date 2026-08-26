@@ -21,7 +21,7 @@ update site_settings set
   owner_email         = 'info@siribaresortwatamu.com',
   facebook_url        = 'https://web.facebook.com/profile.php?id=61572056341645',
   instagram_url       = 'https://www.instagram.com/siribaresortwatamu/',
-  map_embed_url       = 'https://www.google.com/maps?q=Jacaranda+Road,+Watamu,+Kenya&output=embed',
+  map_embed_url       = 'https://www.google.com/maps?q=Siriba+Resort+Watamu&output=embed',
   check_in_time       = '14:00',
   check_out_time      = '10:00',
   hold_duration_hours = 3,
