@@ -140,6 +140,13 @@ export async function createBooking(
     });
   }
 
+  // Release any hold that has run out before looking at availability.
+  // The exclusion constraint cannot judge this itself — its predicate must
+  // be immutable, so it counts every 'held' row regardless of the clock.
+  // Doing it here means an abandoned hold frees its dates on the next
+  // booking attempt rather than waiting for the nightly sweep.
+  await db.rpc("expire_stale_holds");
+
   // Advisory check for a clean error message. The database constraint below
   // is what actually guarantees no double booking under concurrency.
   const { data: available } = await db.rpc("is_apartment_available", {
