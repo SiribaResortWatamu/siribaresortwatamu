@@ -27,7 +27,8 @@ update site_settings set
   hold_duration_hours = 3,
   booking_terms       = 'A deposit confirms your dates. The balance is settled on arrival. Rates are per apartment, per night.',
   cancellation_policy = 'Free cancellation up to 14 days before arrival. Within 14 days the deposit is non-refundable.',
-  arrival_information = 'We are at Neverland Junction on Jacaranda Road, minutes from Watamu Marine National Park. Send us your arrival time and we will meet you at the gate.'
+  arrival_information = 'We are at Neverland Junction on Jacaranda Road, minutes from Watamu Marine National Park. Send us your arrival time and we will meet you at the gate.',
+  review_url          = 'https://g.page/r/CYoEt0let_v4EAE/review'
 where id;
 
 -- ---------------------------------------------------------------------
