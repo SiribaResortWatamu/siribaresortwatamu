@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local scratch file of secrets for pasting into Vercel — never committed
+vercel-env-PASTE-THEN-DELETE.txt
