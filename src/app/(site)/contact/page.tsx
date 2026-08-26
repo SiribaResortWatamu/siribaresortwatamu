@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons";
 import { ContactForm } from "@/components/site/contact-form";
 import { PageHero } from "@/components/site/page-hero";
 import { getPublicSettings } from "@/lib/data/settings";
@@ -55,7 +56,7 @@ export default async function ContactPage() {
 
               {wa && (
                 <ContactRow
-                  icon={<MessageCircle size={19} strokeWidth={1.4} />}
+                  icon={<WhatsAppIcon size={19} />}
                   label="WhatsApp"
                 >
                   <a
@@ -100,7 +101,7 @@ export default async function ContactPage() {
                 rel="noopener noreferrer"
                 className="btn btn-whatsapp mt-9"
               >
-                <MessageCircle size={16} strokeWidth={1.75} />
+                <WhatsAppIcon size={16} />
                 Message us on WhatsApp
               </a>
             )}

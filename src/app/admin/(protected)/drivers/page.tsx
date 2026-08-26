@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Car, MessageCircle, Phone, Plus, UserRound } from "lucide-react";
+import { Car, Phone, Plus, UserRound } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons";
 import {
   EmptyState,
   PageHeader,
@@ -140,7 +141,7 @@ export default async function DriversPage({
                                 aria-label={`WhatsApp ${driver.name}`}
                                 className="flex h-8 w-8 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-sand-deep hover:text-[#1faa54]"
                               >
-                                <MessageCircle size={14} strokeWidth={1.6} />
+                                <WhatsAppIcon size={14} />
                               </a>
                             )}
                           </div>

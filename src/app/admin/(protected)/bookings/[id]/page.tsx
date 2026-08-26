@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Clock, Mail, MessageCircle, Phone } from "lucide-react";
+import { Clock, Mail, Phone } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons";
 import {
   DescriptionList,
   PageHeader,
@@ -302,7 +303,7 @@ export default async function BookingDetailPage({
                   rel="noopener noreferrer"
                   className="btn btn-whatsapp btn-sm"
                 >
-                  <MessageCircle size={14} strokeWidth={1.75} />
+                  <WhatsAppIcon size={14} />
                   WhatsApp
                 </a>
               )}

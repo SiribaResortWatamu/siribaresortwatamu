@@ -1,16 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowRight,
-  BadgeCheck,
-  CalendarCheck,
-  Compass,
-  Car,
-  MapPin,
-  MessageCircle,
-  ShieldCheck,
-  Waves,
-} from "lucide-react";
+import { ArrowRight, BadgeCheck, CalendarCheck, Compass, Car, MapPin, ShieldCheck, Waves } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons";
 import { AccommodationCard, SafariCard, TransferCard } from "@/components/site/cards";
 import { AmenityIcon } from "@/components/site/amenity-icon";
 import { SectionHeading, Rule } from "@/components/site/section";
@@ -436,7 +427,7 @@ export default async function HomePage() {
                 rel="noopener noreferrer"
                 className="btn btn-on-dark w-full sm:w-auto"
               >
-                <MessageCircle size={16} strokeWidth={1.75} />
+                <WhatsAppIcon size={16} />
                 WhatsApp Us
               </a>
             ) : (

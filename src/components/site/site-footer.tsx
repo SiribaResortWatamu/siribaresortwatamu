@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Lock, Mail, MapPin, Phone } from "lucide-react";
+import { FacebookIcon, InstagramIcon, WhatsAppIcon } from "@/components/icons";
 import type { PublicSettings } from "@/lib/types";
 import { telLink, whatsappLink } from "@/lib/whatsapp";
 
@@ -41,17 +42,17 @@ export function SiteFooter({ settings }: { settings: PublicSettings }) {
             <div className="mt-7 flex gap-3">
               {settings.facebook_url && (
                 <SocialLink href={settings.facebook_url} label="Facebook">
-                  <FacebookMark />
+                  <FacebookIcon size={17} />
                 </SocialLink>
               )}
               {settings.instagram_url && (
                 <SocialLink href={settings.instagram_url} label="Instagram">
-                  <InstagramMark />
+                  <InstagramIcon size={17} />
                 </SocialLink>
               )}
               {wa && (
                 <SocialLink href={wa} label="WhatsApp">
-                  <MessageCircle size={17} strokeWidth={1.5} />
+                  <WhatsAppIcon size={17} />
                 </SocialLink>
               )}
             </div>
@@ -99,7 +100,7 @@ export function SiteFooter({ settings }: { settings: PublicSettings }) {
                 rel="noopener noreferrer"
                 className="btn btn-whatsapp btn-sm mt-6"
               >
-                <MessageCircle size={15} strokeWidth={1.75} />
+                <WhatsAppIcon size={15} />
                 Chat on WhatsApp
               </a>
             )}
@@ -110,13 +111,26 @@ export function SiteFooter({ settings }: { settings: PublicSettings }) {
           <p>
             © {new Date().getFullYear()} {settings.property_name}. All rights reserved.
           </p>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
             <Link href="/privacy-policy" className="transition-colors hover:text-sand">
               Privacy Policy
             </Link>
             <Link href="/terms" className="transition-colors hover:text-sand">
               Terms & Conditions
             </Link>
+
+            {/* Staff entrance. Deliberately quiet — it is for the owner, not
+                for guests — and opens in its own tab so a guest who wanders
+                in does not lose the page they were reading. */}
+            <a
+              href="/admin"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sand/40 transition-colors hover:text-sand"
+            >
+              <Lock size={11} strokeWidth={1.75} />
+              Staff Login
+            </a>
           </div>
         </div>
       </div>
@@ -144,34 +158,6 @@ function FooterColumn({
         ))}
       </ul>
     </div>
-  );
-}
-
-/* lucide-react dropped its brand icons, so these two are drawn inline. */
-function FacebookMark() {
-  return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06C2 17.08 5.66 21.25 10.44 22v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.49-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.91h-2.33V22C18.34 21.25 22 17.08 22 12.06Z" />
-    </svg>
-  );
-}
-
-function InstagramMark() {
-  return (
-    <svg
-      width="17"
-      height="17"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      aria-hidden="true"
-    >
-      <rect x="3" y="3" width="18" height="18" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none" />
-    </svg>
   );
 }
 

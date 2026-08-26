@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { Mail, MessageCircle, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons";
 import {
   DescriptionList,
   PageHeader,
@@ -153,7 +154,7 @@ export default async function TransferRequestPage({
                   rel="noopener noreferrer"
                   className="btn btn-whatsapp btn-sm"
                 >
-                  <MessageCircle size={14} strokeWidth={1.75} />
+                  <WhatsAppIcon size={14} />
                   WhatsApp customer
                 </a>
               )}
@@ -170,7 +171,7 @@ export default async function TransferRequestPage({
                   rel="noopener noreferrer"
                   className="btn btn-whatsapp btn-sm"
                 >
-                  <MessageCircle size={14} strokeWidth={1.75} />
+                  <WhatsAppIcon size={14} />
                   WhatsApp driver
                 </a>
               </div>

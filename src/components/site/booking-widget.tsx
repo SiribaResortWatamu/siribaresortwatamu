@@ -3,13 +3,8 @@
 import { useActionState, useMemo, useState } from "react";
 import { DayPicker, type DateRange } from "react-day-picker";
 import "react-day-picker/style.css";
-import {
-  CalendarDays,
-  CheckCircle2,
-  Loader2,
-  MessageCircle,
-  TriangleAlert,
-} from "lucide-react";
+import { CalendarDays, CheckCircle2, Loader2, TriangleAlert } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons";
 import { addDays, parseISO, startOfDay } from "date-fns";
 import { createBooking } from "@/app/actions/public";
 import { IDLE } from "@/lib/action-state";
@@ -103,7 +98,7 @@ export function BookingWidget({
             rel="noopener noreferrer"
             className="btn btn-whatsapp mt-7 w-full"
           >
-            <MessageCircle size={16} strokeWidth={1.75} />
+            <WhatsAppIcon size={16} />
             Message us on WhatsApp
           </a>
         )}
@@ -307,7 +302,7 @@ export function BookingWidget({
             rel="noopener noreferrer"
             className="btn btn-outline w-full"
           >
-            <MessageCircle size={16} strokeWidth={1.75} className="text-[#1faa54]" />
+            <WhatsAppIcon size={16} className="text-[#1faa54]" />
             WhatsApp Us
           </a>
         )}

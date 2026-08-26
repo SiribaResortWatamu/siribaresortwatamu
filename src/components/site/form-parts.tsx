@@ -1,6 +1,7 @@
 "use client";
 
-import { CheckCircle2, MessageCircle, TriangleAlert } from "lucide-react";
+import { CheckCircle2, TriangleAlert } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 /** Shared form furniture for the three public enquiry forms. */
@@ -88,7 +89,7 @@ export function SuccessPanel({
           rel="noopener noreferrer"
           className="btn btn-whatsapp mt-7 w-full"
         >
-          <MessageCircle size={16} strokeWidth={1.75} />
+          <WhatsAppIcon size={16} />
           Message us on WhatsApp
         </a>
       )}

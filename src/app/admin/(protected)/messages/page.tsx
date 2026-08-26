@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Mail, MessageCircle, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons";
 import {
   EmptyState,
   PageHeader,
@@ -144,7 +145,7 @@ export default async function MessagesPage({
                       rel="noopener noreferrer"
                       className="btn btn-whatsapp btn-sm"
                     >
-                      <MessageCircle size={14} strokeWidth={1.75} />
+                      <WhatsAppIcon size={14} />
                       WhatsApp
                     </a>
                   )}

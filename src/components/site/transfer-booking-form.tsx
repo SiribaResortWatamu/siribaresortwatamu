@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Loader2, MessageCircle, Send } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
+import { WhatsAppIcon } from "@/components/icons";
 import { createTransferRequest } from "@/app/actions/public";
 import { IDLE } from "@/lib/action-state";
 import {
@@ -220,7 +221,7 @@ export function TransferBookingForm({
               rel="noopener noreferrer"
               className="btn btn-outline"
             >
-              <MessageCircle size={16} strokeWidth={1.75} className="text-[#1faa54]" />
+              <WhatsAppIcon size={16} className="text-[#1faa54]" />
               Book via WhatsApp
             </a>
           )}
