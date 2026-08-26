@@ -1,26 +1,385 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* =====================================================================
+   Siriba Resort Watamu — design tokens
+   Warm sand, terracotta and ocean teal. Generous whitespace, soft edges.
+   ===================================================================== */
+
+@theme {
+  --color-sand: #f6f1e9;
+  --color-sand-deep: #efe6d8;
+  --color-sand-dark: #e3d6c3;
+  --color-terracotta: #c1694f;
+  --color-terracotta-dark: #a5553d;
+  --color-terracotta-soft: #f0dcd4;
+  --color-ocean: #2c6e6b;
+  --color-ocean-dark: #215350;
+  --color-ocean-soft: #dbe9e8;
+  --color-ink: #26241f;
+  --color-ink-muted: #6b6459;
+  --color-line: #e0d6c6;
+
+  --font-display: var(--font-playfair), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --radius-card: 1.25rem;
+
+  --shadow-soft: 0 1px 2px rgba(38, 36, 31, 0.04), 0 8px 24px -12px rgba(38, 36, 31, 0.14);
+  --shadow-lift: 0 2px 4px rgba(38, 36, 31, 0.05), 0 24px 48px -20px rgba(38, 36, 31, 0.25);
+
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ---------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    background-color: var(--color-sand);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: var(--color-ink);
+  }
+
+  ::selection {
+    background-color: var(--color-terracotta);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ocean);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Respect people who would rather things did not move. */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ---------------------------------------------------------------------
+   Layout helpers
+   --------------------------------------------------------------------- */
+@utility shell {
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+  @media (min-width: 1024px) { padding-inline: 2.5rem; }
+}
+
+@utility shell-narrow {
+  width: 100%;
+  max-width: 52rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+@utility section-y {
+  padding-block: 4.5rem;
+  @media (min-width: 768px) { padding-block: 7rem; }
+}
+
+/* ---------------------------------------------------------------------
+   Typography accents
+   --------------------------------------------------------------------- */
+@utility eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-terracotta);
+}
+
+@utility display-xl {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+@utility display-lg {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+@utility display-md {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  line-height: 1.2;
+}
+
+/* Long-form body copy rendered from the CMS. */
+@utility rich-text {
+  color: var(--color-ink-muted);
+  font-size: 1.0625rem;
+  line-height: 1.8;
+
+  & p + p { margin-top: 1.25rem; }
+  & strong { font-weight: 600; color: var(--color-ink); }
+}
+
+/* ---------------------------------------------------------------------
+   Buttons
+   --------------------------------------------------------------------- */
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    padding: 0.875rem 1.75rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.25s var(--ease-soft),
+                color 0.25s var(--ease-soft),
+                border-color 0.25s var(--ease-soft),
+                transform 0.25s var(--ease-soft),
+                box-shadow 0.25s var(--ease-soft);
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+  .btn-primary {
+    background-color: var(--color-terracotta);
+    color: #fff;
+    box-shadow: var(--shadow-soft);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-terracotta-dark);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .btn-ocean {
+    background-color: var(--color-ocean);
+    color: #fff;
+    box-shadow: var(--shadow-soft);
+  }
+  .btn-ocean:hover:not(:disabled) { background-color: var(--color-ocean-dark); }
+
+  .btn-outline {
+    background-color: transparent;
+    color: var(--color-ink);
+    border: 1px solid var(--color-line);
+  }
+  .btn-outline:hover:not(:disabled) {
+    border-color: var(--color-ink);
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .btn-on-dark {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(6px);
+  }
+  .btn-on-dark:hover:not(:disabled) {
+    background-color: #fff;
+    color: var(--color-ink);
+    border-color: #fff;
+  }
+
+  .btn-whatsapp {
+    background-color: #1faa54;
+    color: #fff;
+  }
+  .btn-whatsapp:hover:not(:disabled) { background-color: #17903f; }
+
+  .btn-sm { padding: 0.5rem 1rem; font-size: 0.8125rem; }
+
+  /* -------------------------------------------------------------------
+     Surfaces
+     ------------------------------------------------------------------- */
+  .card {
+    background-color: #fff;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+  }
+
+  .card-hover {
+    transition: transform 0.4s var(--ease-soft), box-shadow 0.4s var(--ease-soft);
+  }
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .panel {
+    background-color: #fff;
+    border: 1px solid var(--color-line);
+    border-radius: 1rem;
+  }
+
+  /* -------------------------------------------------------------------
+     Forms
+     ------------------------------------------------------------------- */
+  .field-label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--color-ink);
+    margin-bottom: 0.4rem;
+  }
+
+  .input,
+  .select,
+  .textarea {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid var(--color-line);
+    border-radius: 0.65rem;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    font-weight: 300;
+    color: var(--color-ink);
+    transition: border-color 0.2s var(--ease-soft), box-shadow 0.2s var(--ease-soft);
+  }
+  .input::placeholder,
+  .textarea::placeholder { color: #a89f92; }
+
+  .input:focus,
+  .select:focus,
+  .textarea:focus {
+    outline: none;
+    border-color: var(--color-ocean);
+    box-shadow: 0 0 0 3px var(--color-ocean-soft);
+  }
+
+  .textarea { min-height: 6.5rem; resize: vertical; line-height: 1.6; }
+
+  .select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%236b6459' stroke-width='1.5' d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    padding-right: 2.25rem;
+  }
+
+  .field-error {
+    font-size: 0.8125rem;
+    color: #b4402c;
+    margin-top: 0.3rem;
+  }
+
+  /* -------------------------------------------------------------------
+     Status pills
+     ------------------------------------------------------------------- */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 9999px;
+    padding: 0.2rem 0.65rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   react-day-picker
+   --------------------------------------------------------------------- */
+.rdp-root {
+  --rdp-accent-color: var(--color-ocean);
+  --rdp-accent-background-color: var(--color-ocean-soft);
+  --rdp-day-height: 2.5rem;
+  --rdp-day-width: 2.5rem;
+  --rdp-day_button-border-radius: 9999px;
+  --rdp-selected-border: none;
+  --rdp-range_middle-background-color: var(--color-ocean-soft);
+  --rdp-range_middle-color: var(--color-ocean-dark);
+  --rdp-today-color: var(--color-terracotta);
+  --rdp-outside-opacity: 0.35;
+  --rdp-disabled-opacity: 1;
+  font-size: 0.875rem;
+}
+
+.rdp-month_caption {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.rdp-weekday {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.rdp-day_button:hover:not([disabled]) {
+  background-color: var(--color-sand-deep);
+}
+
+/* Booked nights read as struck-through rather than merely faded. */
+.rdp-disabled .rdp-day_button {
+  color: #bdb4a6;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  cursor: not-allowed;
+}
+
+.rdp-range_start .rdp-day_button,
+.rdp-range_end .rdp-day_button,
+.rdp-selected .rdp-day_button {
+  background-color: var(--color-ocean);
+  color: #fff;
+  font-weight: 500;
+}
+
+/* ---------------------------------------------------------------------
+   Motion
+   --------------------------------------------------------------------- */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@utility animate-rise {
+  animation: rise 0.7s var(--ease-soft) both;
+}
+
+@keyframes slow-zoom {
+  from { transform: scale(1.06); }
+  to   { transform: scale(1); }
+}
+
+@utility animate-slow-zoom {
+  animation: slow-zoom 12s var(--ease-soft) both;
 }
