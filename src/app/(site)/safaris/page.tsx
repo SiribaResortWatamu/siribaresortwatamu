@@ -23,8 +23,8 @@ export default async function SafarisPage() {
         eyebrow="Beyond the beach"
         title="Safaris & Experiences"
         intro="Tsavo is close enough for two days. The Mara is a short flight. Everything here is arranged from our own safari desk, with drivers and guides we work with all year."
-        image="https://images.unsplash.com/photo-1516426122078-c23e76319801?w=2400&q=80"
-        imageAlt="Elephants in Tsavo, Kenya"
+        image="/safari-hero.jpg"
+        imageAlt="A safari vehicle parked beneath an acacia tree on the savannah"
         crumbs={[{ href: "/", label: "Home" }, { label: "Safaris" }]}
         compact
       />
