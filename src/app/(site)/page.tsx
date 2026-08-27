@@ -16,8 +16,7 @@ import { whatsappLink } from "@/lib/whatsapp";
 
 export const revalidate = 300;
 
-const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=2400&q=80";
+const HERO_IMAGE = "/hero.jpg";
 
 const REASONS = [
   {
@@ -82,9 +81,12 @@ export default async function HomePage() {
           fill
           priority
           sizes="100vw"
-          className="animate-slow-zoom object-cover"
+          className="animate-slow-zoom object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-ink/65 via-ink/45 to-ink/75" />
+        {/* The scrim is heaviest through the middle, where the headline sits over
+            the white building. Weighting it to the edges — as a stock dark photo
+            would want — left the supporting line short of contrast. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-ink/45 via-ink/65 to-ink/75" />
 
         <div className="shell relative z-10 py-32 text-center">
           <p className="animate-rise text-[0.7rem] font-medium tracking-[0.3em] text-white/80 uppercase">
@@ -102,8 +104,8 @@ export default async function HomePage() {
             className="animate-rise mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-white/85"
             style={{ animationDelay: "160ms" }}
           >
-            Self-catering apartments a few minutes from the Watamu Marine National
-            Park, with safaris inland and private transfers along the coast — all
+            Self-catering apartments nestled in Watamu,
+            with safaris inland and private transfers along the coast all
             arranged by the people who live here.
           </p>
 
