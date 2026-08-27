@@ -24,8 +24,8 @@ export default async function AmenitiesPage() {
         eyebrow="What's here"
         title="Amenities"
         intro="The things that make a self-catering stay work properly — and a few that simply make it nicer."
-        image="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=2400&q=80"
-        imageAlt="Pool at Siriba Resort Watamu"
+        image="/amenities-hero.jpg"
+        imageAlt="Sunset over Watamu, seen from the rooftop terrace"
         crumbs={[{ href: "/", label: "Home" }, { label: "Amenities" }]}
         compact
       />
