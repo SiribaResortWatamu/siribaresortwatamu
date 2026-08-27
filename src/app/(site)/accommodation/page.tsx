@@ -26,8 +26,8 @@ export default async function AccommodationPage() {
         eyebrow="Where you'll stay"
         title="Accommodation"
         intro="Four self-catering apartments set in a walled garden, each with its own kitchen, air conditioning and a place to sit outside."
-        image="https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=2400&q=80"
-        imageAlt="Apartment terrace at Siriba Resort Watamu"
+        image="/accommodation-hero.jpg"
+        imageAlt="The rooftop terrace at Siriba Resort Watamu, with a pergola and seating overlooking the treetops"
         crumbs={[{ href: "/", label: "Home" }, { label: "Accommodation" }]}
         compact
       />
