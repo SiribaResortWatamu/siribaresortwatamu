@@ -22,6 +22,7 @@ export function PageHero({
   crumbs,
   children,
   compact,
+  scrim = "default",
 }: {
   eyebrow?: string;
   title: string;
@@ -31,6 +32,14 @@ export function PageHero({
   crumbs?: Crumb[];
   children?: React.ReactNode;
   compact?: boolean;
+  /**
+   * How hard to darken the photograph.
+   *
+   * "default" suits a bright daylight image. "soft" is for one that is
+   * already dark, where the usual scrim would crush it to black and lose
+   * the subject — the text still has plenty of contrast either way.
+   */
+  scrim?: "default" | "soft";
 }) {
   return (
     <section
@@ -51,7 +60,14 @@ export function PageHero({
         blurDataURL={BLUR_DATA_URL}
         className="object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/50 to-ink/45" />
+      <div
+        className={cn(
+          "absolute inset-0 bg-gradient-to-t",
+          scrim === "soft"
+            ? "from-ink/80 via-ink/30 to-ink/15"
+            : "from-ink/85 via-ink/50 to-ink/45",
+        )}
+      />
 
       <div className="shell relative z-10 pt-32 pb-14 md:pb-20">
         {crumbs && crumbs.length > 0 && (

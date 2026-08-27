@@ -50,8 +50,9 @@ export default async function TransfersPage() {
         eyebrow="Getting around"
         title="Transfers & Private Drivers"
         intro="Convenient private transport across the Kenyan coast — from a five-minute run into Watamu village to the airport at Mombasa, in vehicles and with drivers we know personally."
-        image="https://images.unsplash.com/photo-1464219789935-c2d9d9aba644?w=2400&q=80"
-        imageAlt="Coastal road in Kenya"
+        image="/transfers-hero.jpg"
+        imageAlt="An illuminated taxi sign at night"
+        scrim="soft"
         crumbs={[{ href: "/", label: "Home" }, { label: "Transfers" }]}
         compact
       />
