@@ -83,10 +83,7 @@ export default async function HomePage() {
           sizes="100vw"
           className="animate-slow-zoom object-cover object-center"
         />
-        {/* The scrim is heaviest through the middle, where the headline sits over
-            the white building. Weighting it to the edges — as a stock dark photo
-            would want — left the supporting line short of contrast. */}
-        <div className="absolute inset-0 bg-gradient-to-b from-ink/45 via-ink/65 to-ink/75" />
+        <div className="absolute inset-0 bg-gradient-to-b from-ink/55 via-ink/45 to-ink/75" />
 
         <div className="shell relative z-10 py-32 text-center">
           <p className="animate-rise text-[0.7rem] font-medium tracking-[0.3em] text-white/80 uppercase">
@@ -106,7 +103,7 @@ export default async function HomePage() {
           >
             Self-catering apartments nestled in Watamu,
             with safaris inland and private transfers along the coast all
-            arranged by the people who live here.
+            arranged by the people who live here. 
           </p>
 
           <div
@@ -143,15 +140,14 @@ export default async function HomePage() {
             <Rule className="mt-7" />
             <div className="rich-text mt-7 space-y-5">
               <p>
-                Siriba is a small collection of self-catering apartments set in a
-                walled tropical garden in Watamu, between the creek and the reef. There
-                are four of them, not forty — which is the point.
+                Experience the ultimate blend of modern luxury and authentic coastal charm. 
+                From our spacious apartments to our world-class amenities, 
+                every detail is designed to provide an unforgettable stay.
               </p>
               <p>
                 You get a kitchen you can actually cook in, a pool that is never
                 crowded, and a gate that someone is always watching. What you do with
-                the days is up to you: the marine park is minutes away, Tsavo is a
-                morning&apos;s drive, and we can put a driver at your door for either.
+                the days is up to you.
               </p>
             </div>
 
@@ -165,32 +161,36 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:gap-5">
-            <div className="relative col-span-1 aspect-[3/4] overflow-hidden rounded-2xl">
+          {/* All three photographs are landscape 3:2. The previous portrait
+              and square frames would have cropped nearly half the width off
+              the building, so the frames follow the photographs instead. */}
+          <div className="grid gap-4 sm:gap-5">
+            <div className="relative aspect-[3/2] overflow-hidden rounded-2xl">
               <Image
-                src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1200&q=80"
-                alt="Pool and garden at the resort"
+                src="/property-exterior.jpg"
+                alt="The apartment building at Siriba Resort Watamu, with balconies overlooking the garden"
                 fill
-                sizes="(min-width: 1024px) 25vw, 45vw"
+                sizes="(min-width: 1024px) 46vw, 92vw"
                 className="object-cover"
               />
             </div>
-            <div className="mt-10 grid gap-4 sm:gap-5">
-              <div className="relative aspect-square overflow-hidden rounded-2xl">
+
+            <div className="grid grid-cols-2 gap-4 sm:gap-5">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1519046904884-53103b34b206?w=1200&q=80"
-                  alt="Watamu beach"
+                  src="/property-lounge.jpg"
+                  alt="Living room in one of the apartments, with sofas and a television"
                   fill
-                  sizes="(min-width: 1024px) 25vw, 45vw"
+                  sizes="(min-width: 1024px) 23vw, 45vw"
                   className="object-cover"
                 />
               </div>
-              <div className="relative aspect-square overflow-hidden rounded-2xl">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1540541338287-41700207dee6?w=1200&q=80"
-                  alt="Apartment interior"
+                  src="/property-bedroom.jpg"
+                  alt="Bedroom with a four-poster bed, mosquito net and air conditioning"
                   fill
-                  sizes="(min-width: 1024px) 25vw, 45vw"
+                  sizes="(min-width: 1024px) 23vw, 45vw"
                   className="object-cover"
                 />
               </div>
