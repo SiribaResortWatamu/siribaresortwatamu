@@ -35,7 +35,9 @@ export function PageHero({
   return (
     <section
       className={cn(
-        "relative flex items-end overflow-hidden",
+        // Dark base: the overlay is semi-transparent, so without this a
+        // slow or failed photo would leave white text on near-white.
+        "relative flex items-end overflow-hidden bg-ink",
         compact ? "min-h-[46vh] md:min-h-[52vh]" : "min-h-[62vh] md:min-h-[70vh]",
       )}
     >

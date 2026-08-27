@@ -382,6 +382,7 @@ export interface SiteSettings {
   property_name: string;
   tagline: string | null;
   logo_path: string | null;
+  logo_light_path: string | null;
   address: string | null;
   phone: string | null;
   whatsapp: string | null;
@@ -417,6 +418,7 @@ export type PublicSettings = Pick<
   | "property_name"
   | "tagline"
   | "logo_path"
+  | "logo_light_path"
   | "address"
   | "phone"
   | "whatsapp"

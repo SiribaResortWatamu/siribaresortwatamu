@@ -356,6 +356,8 @@ export async function saveSettings(
   const record = {
     property_name: String(formData.get("property_name") ?? "").trim() || "Siriba Resort Watamu",
     tagline: textField(formData.get("tagline")),
+    logo_path: textField(formData.get("logo_path")),
+    logo_light_path: textField(formData.get("logo_light_path")),
     address: textField(formData.get("address")),
     phone: textField(formData.get("phone")),
     whatsapp: textField(formData.get("whatsapp")),

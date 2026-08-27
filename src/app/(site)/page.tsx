@@ -75,7 +75,7 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------
           1. Hero
           --------------------------------------------------------------- */}
-      <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden">
+      <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-ink">
         <Image
           src={HERO_IMAGE}
           alt="The Indian Ocean at Watamu on the Kenyan coast"

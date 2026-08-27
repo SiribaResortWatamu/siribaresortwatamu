@@ -8,7 +8,12 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader propertyName={settings.property_name} phone={settings.phone} />
+      <SiteHeader
+        propertyName={settings.property_name}
+        phone={settings.phone}
+        logoPath={settings.logo_path}
+        logoLightPath={settings.logo_light_path}
+      />
       <main className="flex-1">{children}</main>
       <SiteFooter settings={settings} />
       <WhatsAppFab whatsapp={settings.whatsapp} />

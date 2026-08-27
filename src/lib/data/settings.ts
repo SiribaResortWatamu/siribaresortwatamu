@@ -8,6 +8,7 @@ const FALLBACK: PublicSettings = {
   property_name: "Siriba Resort Watamu",
   tagline: "Your Coastal Escape Starts Here",
   logo_path: null,
+  logo_light_path: null,
   address: "Watamu, Kilifi County, Kenya",
   phone: null,
   whatsapp: null,

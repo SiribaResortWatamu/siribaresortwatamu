@@ -3,6 +3,7 @@ import { Lock, Mail, MapPin, Phone } from "lucide-react";
 import { FacebookIcon, InstagramIcon, WhatsAppIcon } from "@/components/icons";
 import type { PublicSettings } from "@/lib/types";
 import { telLink, whatsappLink } from "@/lib/whatsapp";
+import { SiteLogo } from "@/components/site/site-logo";
 
 const EXPLORE = [
   { href: "/accommodation", label: "Accommodation" },
@@ -27,9 +28,13 @@ export function SiteFooter({ settings }: { settings: PublicSettings }) {
       <div className="shell py-16 md:py-20">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1.4fr]">
           <div>
-            <p className="font-display text-2xl font-semibold text-white">
-              {settings.property_name}
-            </p>
+            <SiteLogo
+              variant="light"
+              logoPath={settings.logo_path}
+              logoLightPath={settings.logo_light_path}
+              propertyName={settings.property_name}
+              className="h-11"
+            />
             <p className="mt-1 text-[0.65rem] tracking-[0.22em] text-sand/50 uppercase">
               Watamu · Kilifi County · Kenya
             </p>

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { telLink } from "@/lib/whatsapp";
+import { SiteLogo } from "@/components/site/site-logo";
 
 const NAV = [
   { href: "/", label: "Home" },
@@ -20,9 +21,13 @@ const NAV = [
 export function SiteHeader({
   propertyName,
   phone,
+  logoPath,
+  logoLightPath,
 }: {
   propertyName: string;
   phone: string | null;
+  logoPath: string | null;
+  logoLightPath: string | null;
 }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -60,21 +65,33 @@ export function SiteHeader({
       )}
     >
       <div className="shell flex h-18 items-center justify-between gap-6 py-4 lg:h-20">
-        <Link
-          href="/"
-          className={cn(
-            "font-display text-lg leading-tight font-semibold tracking-tight transition-colors lg:text-xl",
-            solid ? "text-ink" : "text-white",
-          )}
-        >
-          {propertyName}
-          <span
-            className={cn(
-              "mt-0.5 block text-[0.6rem] font-sans font-normal tracking-[0.22em] uppercase transition-colors",
-              solid ? "text-ink-muted" : "text-white/75",
-            )}
-          >
-            Watamu · Kenya
+        <Link href="/" aria-label={`${propertyName} — home`} className="shrink-0">
+          {/* Both artworks are rendered and cross-faded, rather than swapped
+              on the `solid` flag. Swapping the src would re-fetch and flash
+              the logo every time the header changes state on scroll. */}
+          <span className="relative block h-9 w-[10.5rem] sm:h-10 sm:w-[12rem]">
+            <SiteLogo
+              variant="dark"
+              logoPath={logoPath}
+              logoLightPath={logoLightPath}
+              propertyName={propertyName}
+              priority
+              className={cn(
+                "absolute inset-0 h-full transition-opacity duration-500",
+                solid ? "opacity-100" : "opacity-0",
+              )}
+            />
+            <SiteLogo
+              variant="light"
+              logoPath={logoPath}
+              logoLightPath={logoLightPath}
+              propertyName={propertyName}
+              priority
+              className={cn(
+                "absolute inset-0 h-full transition-opacity duration-500",
+                solid ? "opacity-0" : "opacity-100",
+              )}
+            />
           </span>
         </Link>
 

@@ -9,6 +9,7 @@ import {
   FormSection,
   SubmitButton,
 } from "@/components/admin/form";
+import { LogoUpload } from "@/components/admin/logo-upload";
 import type { SiteSettings } from "@/lib/types";
 
 export function SettingsForm({ settings }: { settings: SiteSettings }) {
@@ -36,6 +37,24 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
           <AdminField label="Tagline" hint="the headline on the homepage hero">
             <input name="tagline" className="input" defaultValue={settings.tagline ?? ""} />
           </AdminField>
+
+          <LogoUpload
+            name="logo_path"
+            label="Logo"
+            hint="dark artwork, shown on light backgrounds"
+            defaultValue={settings.logo_path}
+            fallback="/logo.png"
+            preview="dark"
+          />
+
+          <LogoUpload
+            name="logo_light_path"
+            label="Logo (reversed)"
+            hint="light artwork, for the footer and the homepage hero"
+            defaultValue={settings.logo_light_path}
+            fallback="/logo-light.png"
+            preview="light"
+          />
 
           <AdminField label="Address">
             <input name="address" className="input" defaultValue={settings.address ?? ""} />
