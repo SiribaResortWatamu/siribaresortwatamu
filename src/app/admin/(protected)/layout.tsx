@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { AdminNav } from "@/components/admin/admin-nav";
-import { requireAdmin } from "@/lib/auth";
+import { NotAuthorised } from "@/components/admin/not-authorised";
+import { getAdminAccess } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
@@ -16,7 +18,14 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await requireAdmin();
+  const access = await getAdminAccess();
+
+  // A valid session that is not staff gets an explanation, never a bounce
+  // back to the login page — the middleware would only send them here again.
+  if (access.status === "signed-out") redirect("/admin/login");
+  if (access.status === "not-admin") return <NotAuthorised email={access.email} />;
+
+  const user = access.user;
   const badges = await getBadgeCounts();
 
   return (
