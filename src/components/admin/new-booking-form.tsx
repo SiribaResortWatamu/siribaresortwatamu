@@ -10,16 +10,48 @@ import {
   FormSection,
   SubmitButton,
 } from "@/components/admin/form";
-import { formatMoney, toDateKey } from "@/lib/format";
+import { formatDate, formatMoney, toDateKey } from "@/lib/format";
 import { quoteStay } from "@/lib/pricing";
 import type { Apartment } from "@/lib/types";
+
+/**
+ * A stretch of nights that cannot be sold again: an existing booking, a
+ * reservation synced from Airbnb or Booking.com, or a manual block.
+ *
+ * `end` is exclusive — the morning of departure, matching how check-out
+ * and iCal DTEND both work. A stay ending on the 23rd and one starting on
+ * the 23rd do not overlap.
+ */
+export interface UnavailablePeriod {
+  start: string;
+  end: string;
+  label: string;
+  kind: "booking" | "channel" | "block";
+}
+
+const KIND_LABELS: Record<UnavailablePeriod["kind"], string> = {
+  booking: "Direct booking",
+  channel: "Synced from channel",
+  block: "Blocked",
+};
+
+/** Half-open ranges, so touching ranges are not a clash. */
+function overlaps(period: UnavailablePeriod, from: string, to: string): boolean {
+  return period.start < to && from < period.end;
+}
 
 /**
  * Manual booking entry, for the phone and WhatsApp reservations that never
  * touch the website. The figures shown are a preview; the server recomputes
  * and the database still refuses anything that would double-book.
  */
-export function NewBookingForm({ apartments }: { apartments: Apartment[] }) {
+export function NewBookingForm({
+  apartments,
+  unavailable = {},
+}: {
+  apartments: Apartment[];
+  unavailable?: Record<string, UnavailablePeriod[]>;
+}) {
   const [state, formAction] = useActionState(createAdminBooking, IDLE);
   const errors = state.status === "error" ? (state.fieldErrors ?? {}) : {};
 
@@ -34,6 +66,19 @@ export function NewBookingForm({ apartments }: { apartments: Apartment[] }) {
     if (!apartment || !checkIn || !checkOut || checkOut <= checkIn) return null;
     return quoteStay(apartment, checkIn, checkOut);
   }, [apartment, checkIn, checkOut]);
+
+  const periods = useMemo(
+    () => unavailable[apartmentId] ?? [],
+    [unavailable, apartmentId],
+  );
+
+  // Everything the chosen range runs into. The database would refuse the
+  // booking anyway, but finding that out after filling in the guest's
+  // details is a poor way to learn the dates were never free.
+  const clashes = useMemo(() => {
+    if (!checkIn || !checkOut || checkOut <= checkIn) return [];
+    return periods.filter((period) => overlaps(period, checkIn, checkOut));
+  }, [periods, checkIn, checkOut]);
 
   if (apartments.length === 0) {
     return (
@@ -111,6 +156,47 @@ export function NewBookingForm({ apartments }: { apartments: Apartment[] }) {
                 </select>
               </AdminField>
             </div>
+
+            {clashes.length > 0 && (
+              <div className="rounded-xl bg-[#fbe1dc] px-4 py-3.5 text-sm text-[#a3402c]">
+                <p className="font-medium">
+                  These dates are not free
+                  {apartment ? ` for ${apartment.name}` : ""}.
+                </p>
+                <ul className="mt-2 space-y-1 text-xs">
+                  {clashes.map((clash, index) => (
+                    <li key={`${clash.start}-${index}`}>
+                      {formatDate(clash.start, "d MMM")}
+                      <span className="mx-1">→</span>
+                      {formatDate(clash.end, "d MMM yyyy")} · {clash.label}{" "}
+                      <span className="opacity-70">({KIND_LABELS[clash.kind]})</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-2 text-xs">
+                  Pick different dates, or release whatever is holding these ones.
+                </p>
+              </div>
+            )}
+
+            {clashes.length === 0 && periods.length > 0 && (
+              <details className="rounded-xl bg-sand-deep/70 px-4 py-3">
+                <summary className="cursor-pointer text-xs text-ink-muted">
+                  {periods.length} unavailable{" "}
+                  {periods.length === 1 ? "period" : "periods"} ahead
+                  {apartment ? ` for ${apartment.name}` : ""}
+                </summary>
+                <ul className="mt-2 space-y-1 text-xs text-ink-muted">
+                  {periods.map((period, index) => (
+                    <li key={`${period.start}-${index}`}>
+                      {formatDate(period.start, "d MMM")}
+                      <span className="mx-1">→</span>
+                      {formatDate(period.end, "d MMM yyyy")} · {period.label}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
 
             {quote && (
               <div className="rounded-xl bg-sand-deep/70 px-4 py-3.5 text-sm">
@@ -220,7 +306,9 @@ export function NewBookingForm({ apartments }: { apartments: Apartment[] }) {
             </AdminField>
 
             <div className="flex flex-col gap-2 border-t border-line pt-4">
-              <SubmitButton className="w-full">Create booking</SubmitButton>
+              <SubmitButton className="w-full" disabled={clashes.length > 0}>
+                Create booking
+              </SubmitButton>
               <Link href="/admin/bookings" className="btn btn-outline btn-sm w-full">
                 Cancel
               </Link>
@@ -228,8 +316,10 @@ export function NewBookingForm({ apartments }: { apartments: Apartment[] }) {
           </FormSection>
 
           <div className="rounded-xl bg-ocean-soft/60 p-4 text-xs leading-relaxed text-ocean-dark">
-            The database refuses any booking that overlaps an existing one or a blocked
-            period for the same accommodation, so you cannot double-book by accident.
+            Dates already taken — by a direct booking, or by a reservation synced
+            from Airbnb or Booking.com — are listed above and cannot be submitted.
+            The database refuses an overlap as well, so you cannot double-book by
+            accident.
           </div>
         </aside>
       </div>

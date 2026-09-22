@@ -68,6 +68,7 @@ export function SubmitButton({
   name,
   value,
   confirm,
+  disabled = false,
 }: {
   children: React.ReactNode;
   variant?: "primary" | "outline" | "ocean" | "danger";
@@ -76,6 +77,8 @@ export function SubmitButton({
   value?: string;
   /** Ask before submitting — for archiving, cancelling and deleting. */
   confirm?: string;
+  /** Hold the form back while it is known to be invalid. */
+  disabled?: boolean;
 }) {
   const { pending } = useFormStatus();
 
@@ -91,7 +94,7 @@ export function SubmitButton({
       type="submit"
       name={name}
       value={value}
-      disabled={pending}
+      disabled={pending || disabled}
       onClick={(event) => {
         if (confirm && !window.confirm(confirm)) event.preventDefault();
       }}

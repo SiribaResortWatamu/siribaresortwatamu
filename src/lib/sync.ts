@@ -61,20 +61,59 @@ export async function syncApartment(apartment: Apartment): Promise<SyncResult> {
 
       seenUids.push(event.uid);
 
+      // Match the existing row by hand rather than upserting.
+      //
+      // The unique index this would need to conflict against is partial —
+      // `(apartment_id, source, external_uid) where external_uid is not
+      // null` — and Postgres will not infer a partial index from an ON
+      // CONFLICT target unless the predicate is restated, which PostgREST
+      // gives us no way to send. The upsert that used to be here therefore
+      // failed with 42P10 on every single row and imported nothing, while
+      // still reporting a successful sync.
+      const { data: existing, error: lookupError } = await db
+        .from("blocked_dates")
+        .select("id, start_date, end_date")
+        .eq("apartment_id", apartment.id)
+        .eq("source", channel.source)
+        .eq("external_uid", event.uid)
+        .maybeSingle();
+
+      if (lookupError) {
+        result.errors.push(`${channel.label}: ${lookupError.message}`);
+        continue;
+      }
+
+      if (existing) {
+        // Already held on the same nights, so there is nothing to write.
+        if (existing.start_date === start && existing.end_date === end) {
+          result.imported += 1;
+          continue;
+        }
+
+        // The reservation moved. Delete and re-insert rather than update,
+        // so the `before insert` booking guard still gets to veto it.
+        const { error: deleteError } = await db
+          .from("blocked_dates")
+          .delete()
+          .eq("id", existing.id);
+
+        if (deleteError) {
+          result.errors.push(`${channel.label}: ${deleteError.message}`);
+          continue;
+        }
+      }
+
       const { data, error } = await db
         .from("blocked_dates")
-        .upsert(
-          {
-            apartment_id: apartment.id,
-            start_date: start,
-            end_date: end,
-            reason: "external_ical",
-            source: channel.source,
-            note: `${channel.label}: ${event.summary}`,
-            external_uid: event.uid,
-          },
-          { onConflict: "apartment_id,source,external_uid", ignoreDuplicates: false },
-        )
+        .insert({
+          apartment_id: apartment.id,
+          start_date: start,
+          end_date: end,
+          reason: "external_ical",
+          source: channel.source,
+          note: `${channel.label}: ${event.summary}`,
+          external_uid: event.uid,
+        })
         .select("id");
 
       if (error) {
@@ -109,10 +148,15 @@ export async function syncApartment(apartment: Apartment): Promise<SyncResult> {
     }
   }
 
-  await db
-    .from("apartments")
-    .update({ last_synced_at: new Date().toISOString() })
-    .eq("id", apartment.id);
+  // Only stamp a clean run. Updating this unconditionally is what let a
+  // sync that imported nothing at all keep reporting a healthy timestamp
+  // on the calendar page, which is why this went unnoticed.
+  if (result.errors.length === 0) {
+    await db
+      .from("apartments")
+      .update({ last_synced_at: new Date().toISOString() })
+      .eq("id", apartment.id);
+  }
 
   return result;
 }
