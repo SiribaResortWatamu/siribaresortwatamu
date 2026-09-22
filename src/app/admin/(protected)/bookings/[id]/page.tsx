@@ -115,7 +115,8 @@ export default async function BookingDetailPage({
                 variant="primary"
               />
             )}
-          {["pending", "held", "confirmed"].includes(booking.booking_status) && (
+          {booking.source === "website" &&
+            ["pending", "held", "confirmed"].includes(booking.booking_status) && (
             <StatusAction
               id={booking.id}
               status="cancelled"

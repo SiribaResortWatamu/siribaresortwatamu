@@ -249,6 +249,16 @@ export async function setBookingStatus(formData: FormData): Promise<void> {
   if (!id || !status.success) return;
 
   const db = supabaseAdmin();
+  if (status.data === "cancelled") {
+    const { data: existingRow } = await db
+      .from("bookings")
+      .select("source")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (!existingRow || existingRow.source !== "website") return;
+  }
+
   const now = new Date().toISOString();
 
   const patch: Record<string, unknown> = { booking_status: status.data };
