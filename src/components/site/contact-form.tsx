@@ -20,7 +20,7 @@ export function ContactForm() {
   }
 
   return (
-    <form action={formAction} className="card p-7 sm:p-9">
+    <form action={formAction} className="@container card p-7 sm:p-9">
       <h2 className="font-display text-xl font-semibold">Send us a message</h2>
       <p className="mt-2 text-sm leading-relaxed text-ink-muted">
         Questions about availability, safaris or getting here — anything at all. We

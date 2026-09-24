@@ -111,18 +111,33 @@ export function ContactFields({
         <input name="name" className="input" required autoComplete="name" />
       </Field>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      {/*
+        Container query, not `sm:`. These fields sit in a 24rem sidebar on
+        the safari and transfer pages, and a viewport breakpoint knows
+        nothing about that — `sm:grid-cols-2` matched on every desktop and
+        split a 320px box into two 151px columns. The form has `@container`
+        on it, so this now responds to the space it actually has.
+      */}
+      <div className="grid gap-4 @sm:grid-cols-2">
         <Field label="Email" error={errors.email}>
           <input name="email" type="email" className="input" required autoComplete="email" />
         </Field>
-        <Field label="Phone" error={errors.phone}>
-          <input name="phone" type="tel" className="input" autoComplete="tel" />
+        {/*
+          WhatsApp only — no separate phone field. It is the channel the
+          property actually replies on, and asking for both got one number
+          twice or a landline nobody watches.
+        */}
+        <Field label="WhatsApp number" hint="optional" error={errors.whatsapp}>
+          <input
+            name="whatsapp"
+            type="tel"
+            inputMode="tel"
+            className="input"
+            placeholder="+254 7…"
+            autoComplete="tel"
+          />
         </Field>
       </div>
-
-      <Field label="WhatsApp" hint="optional" error={errors.whatsapp}>
-        <input name="whatsapp" type="tel" className="input" placeholder="+254 7…" />
-      </Field>
     </>
   );
 }

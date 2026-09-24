@@ -42,7 +42,7 @@ export function SafariEnquiryForm({
   }
 
   return (
-    <form action={formAction} className="card p-7 sm:p-8">
+    <form action={formAction} className="@container card p-7 sm:p-8">
       <input type="hidden" name="safariId" value={safari.id} />
 
       <h3 className="font-display text-xl font-semibold">Enquire about this safari</h3>
@@ -54,7 +54,7 @@ export function SafariEnquiryForm({
       <div className="mt-7 space-y-4">
         <ContactFields errors={errors} />
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 @sm:grid-cols-2">
           <Field label="Preferred travel date" hint="optional" error={errors.travelDate}>
             <input
               name="travelDate"
@@ -121,7 +121,7 @@ export function SafariEnquiryForm({
 
         {state.status === "error" && <FormNotice>{state.message}</FormNotice>}
 
-        <div className="flex flex-col gap-3 pt-1 sm:flex-row">
+        <div className="flex flex-col gap-3 pt-1 @sm:flex-row">
           <button type="submit" disabled={pending} className="btn btn-primary flex-1">
             {pending ? (
               <>

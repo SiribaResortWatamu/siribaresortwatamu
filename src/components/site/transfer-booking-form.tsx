@@ -52,7 +52,7 @@ export function TransferBookingForm({
   const hasTrainField = /sgr|train|rail/i.test(service.service_type);
 
   return (
-    <form action={formAction} className="card p-7 sm:p-8">
+    <form action={formAction} className="@container card p-7 sm:p-8">
       <input type="hidden" name="transferId" value={service.id} />
 
       <h3 className="font-display text-xl font-semibold">Request this transfer</h3>
@@ -62,7 +62,7 @@ export function TransferBookingForm({
       </p>
 
       <div className="mt-7 space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 @sm:grid-cols-2">
           <Field label="Pick-up location" error={errors.pickupLocation}>
             <input
               name="pickupLocation"
@@ -96,7 +96,7 @@ export function TransferBookingForm({
           </Field>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 @sm:grid-cols-2">
           <Field label="Date" error={errors.transferDate}>
             <input
               name="transferDate"
@@ -111,7 +111,7 @@ export function TransferBookingForm({
           </Field>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 @sm:grid-cols-2">
           <Field label="Passengers" error={errors.passengers}>
             <select
               name="passengers"
@@ -141,7 +141,7 @@ export function TransferBookingForm({
         </div>
 
         {(hasFlightField || hasTrainField) && (
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 @sm:grid-cols-2">
             {hasFlightField && (
               <Field label="Flight number" hint="optional" error={errors.flightNumber}>
                 <input name="flightNumber" className="input" placeholder="e.g. KQ 610" />
@@ -199,7 +199,7 @@ export function TransferBookingForm({
 
         {state.status === "error" && <FormNotice>{state.message}</FormNotice>}
 
-        <div className="flex flex-col gap-3 pt-1 sm:flex-row">
+        <div className="flex flex-col gap-3 pt-1 @sm:flex-row">
           <button type="submit" disabled={pending} className="btn btn-primary flex-1">
             {pending ? (
               <>
