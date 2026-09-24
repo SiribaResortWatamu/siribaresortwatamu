@@ -46,6 +46,21 @@ try {
     )
   `);
 
+  // Secured here as well as in 0008, because on a fresh project this table
+  // exists before any migration runs. An unprotected table in the public
+  // schema is reachable through PostgREST with the anon key, and that key
+  // ships in the website's JavaScript.
+  await client.query("alter table schema_migrations enable row level security");
+  await client.query(`
+    do $$
+    begin
+      execute 'revoke all on schema_migrations from anon, authenticated';
+    exception
+      -- Those roles exist on Supabase, not on a bare Postgres.
+      when undefined_object then null;
+    end $$;
+  `);
+
   const applied = new Set(
     (await client.query("select filename from schema_migrations")).rows.map(
       (r) => r.filename,
