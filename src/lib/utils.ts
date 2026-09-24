@@ -5,6 +5,23 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * A search term, safe to drop into a PostgREST `.or()` filter.
+ *
+ * PostgREST parses `,` `.` `(` and `)` as filter syntax, so interpolating a
+ * raw term lets whatever someone types become extra conditions — searching
+ * for `a,id.gt.0` would widen the query rather than match a name. Wrapping
+ * the value in double quotes takes those characters out of the grammar;
+ * inside quotes only a backslash and a double quote still need escaping.
+ *
+ * Always use this for the value half of a filter built by hand. The typed
+ * builders (`.eq()`, `.ilike()`, …) escape their own arguments.
+ */
+export function filterTerm(raw: string): string {
+  const escaped = raw.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  return `"%${escaped}%"`;
+}
+
 /** Turn any title into a clean, URL-safe slug. */
 export function slugify(input: string): string {
   return input

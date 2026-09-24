@@ -13,7 +13,7 @@ import {
 } from "@/components/admin/ui";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { formatDate, formatMoney, humanise } from "@/lib/format";
-import { cn } from "@/lib/utils";
+import { cn, filterTerm } from "@/lib/utils";
 import type { Booking, BlockedDate } from "@/lib/types";
 
 export const metadata = { title: "Bookings" };
@@ -81,7 +81,8 @@ export default async function AdminBookingsPage({
   }
 
   if (q.trim()) {
-    const term = `%${q.trim()}%`;
+    // Quoted — see filterTerm. A raw term here could inject extra conditions.
+    const term = filterTerm(q.trim());
     query = query.or(
       `guest_name_snapshot.ilike.${term},booking_reference.ilike.${term},guest_email_snapshot.ilike.${term}`,
     );

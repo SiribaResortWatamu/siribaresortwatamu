@@ -11,6 +11,7 @@ import {
 } from "@/components/admin/ui";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { formatDate, formatMoney } from "@/lib/format";
+import { filterTerm } from "@/lib/utils";
 import type { Booking, Guest } from "@/lib/types";
 
 export const metadata = { title: "Guests" };
@@ -26,7 +27,8 @@ export default async function GuestsPage({
   let query = db.from("guests").select("*").order("created_at", { ascending: false });
 
   if (q.trim()) {
-    const term = `%${q.trim()}%`;
+    // Quoted — see filterTerm. A raw term here could inject extra conditions.
+    const term = filterTerm(q.trim());
     query = query.or(`name.ilike.${term},email.ilike.${term},phone.ilike.${term}`);
   }
 
