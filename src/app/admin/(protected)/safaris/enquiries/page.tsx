@@ -14,7 +14,7 @@ import { formatDate, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { EnquiryStatus, SafariEnquiry } from "@/lib/types";
 
-export const metadata = { title: "Safari Enquiries" };
+export const metadata = { title: "Safari & Excursion Enquiries" };
 
 const FILTERS: { value: string; label: string }[] = [
   { value: "open", label: "Open" },
@@ -53,9 +53,9 @@ export default async function SafariEnquiriesPage({
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Safari enquiries"
+        title="Safari & excursion enquiries"
         subtitle="Everyone who has asked about a safari, and where each one stands."
-        back={{ href: "/admin/safaris", label: "Safaris" }}
+        back={{ href: "/admin/safaris", label: "Safaris & Excursions" }}
       />
 
       <nav className="flex flex-wrap gap-2">

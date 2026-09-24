@@ -63,7 +63,7 @@ export default async function TermsPage() {
           ],
         },
         {
-          heading: "Safaris",
+          heading: "Safaris & Excursions",
           paragraphs: [
             "Safari prices are per person sharing and depend on the number travelling, the season and park fees current at the time. The price is confirmed in writing when you accept our quote.",
             "Wildlife sightings, migration timing and weather cannot be guaranteed. Itineraries may be adjusted by your guide for safety, road conditions or park regulations.",

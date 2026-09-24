@@ -180,7 +180,7 @@ export default async function AdminDashboardPage() {
             tone={stats.outstanding_balance > 0 ? "attention" : "neutral"}
           />
           <StatCard
-            label="Safari enquiries"
+            label="Safari & excursion enquiries"
             value={stats.safari_enquiries}
             icon={<Compass size={17} strokeWidth={1.5} />}
             href="/admin/safaris/enquiries"

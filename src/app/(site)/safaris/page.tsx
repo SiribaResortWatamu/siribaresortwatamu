@@ -8,9 +8,9 @@ import { getPublicSettings } from "@/lib/data/settings";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Safaris",
+  title: "Safaris & Excursions",
   description:
-    "Safaris from the Kenyan coast — Tsavo East in two days, a fly-in to the Masai Mara, and day trips to the Gede Ruins and Mida Creek.",
+    "Safaris and excursions from the Kenyan coast — Tsavo East in two days, a fly-in to the Masai Mara, and day trips to the Gede Ruins and Mida Creek.",
   alternates: { canonical: "/safaris" },
 };
 
@@ -21,11 +21,11 @@ export default async function SafarisPage() {
     <>
       <PageHero
         eyebrow="Beyond the beach"
-        title="Safaris & Experiences"
+        title="Safaris & Excursions"
         intro="Tsavo is close enough for two days. The Mara is a short flight. Everything here is arranged from our own safari desk, with drivers and guides we work with all year."
         image="/safari-hero.jpg"
         imageAlt="A safari vehicle parked beneath an acacia tree on the savannah"
-        crumbs={[{ href: "/", label: "Home" }, { label: "Safaris" }]}
+        crumbs={[{ href: "/", label: "Home" }, { label: "Safaris & Excursions" }]}
         compact
       />
 
@@ -62,7 +62,7 @@ export default async function SafarisPage() {
 function EmptyState() {
   return (
     <div className="panel mx-auto max-w-lg px-8 py-14 text-center">
-      <h2 className="font-display text-xl font-semibold">Safari packages coming soon</h2>
+      <h2 className="font-display text-xl font-semibold">Safaris &amp; excursions coming soon</h2>
       <p className="mt-3 text-sm leading-relaxed text-ink-muted">
         We are updating our itineraries. Tell us where you would like to go and we will
         build something for you.

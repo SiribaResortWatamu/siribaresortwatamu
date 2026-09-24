@@ -9,7 +9,7 @@ export default function NewSafariPage() {
       <PageHeader
         title="Add safari"
         subtitle="Build the itinerary day by day. The public page is generated for you."
-        back={{ href: "/admin/safaris", label: "Safaris" }}
+        back={{ href: "/admin/safaris", label: "Safaris & Excursions" }}
       />
       <SafariForm />
     </div>

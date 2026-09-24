@@ -81,7 +81,7 @@ export default async function SafariDetailPage({
         imageAlt={coverAlt(safari.safari_photos, safari.name)}
         crumbs={[
           { href: "/", label: "Home" },
-          { href: "/safaris", label: "Safaris" },
+          { href: "/safaris", label: "Safaris & Excursions" },
           { label: safari.name },
         ]}
       >
@@ -309,7 +309,7 @@ export default async function SafariDetailPage({
                 href="/safaris"
                 className="text-sm font-medium text-ocean transition-colors hover:text-ocean-dark"
               >
-                ← Back to all safaris
+                ← Back to all safaris &amp; excursions
               </Link>
             </div>
           </div>

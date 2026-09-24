@@ -11,7 +11,7 @@ import { SiteLogo } from "@/components/site/site-logo";
 const NAV = [
   { href: "/", label: "Home" },
   { href: "/accommodation", label: "Accommodation" },
-  { href: "/safaris", label: "Safaris" },
+  { href: "/safaris", label: "Safaris & Excursions" },
   { href: "/transfers", label: "Transfers" },
   { href: "/amenities", label: "Amenities" },
   { href: "/about", label: "About" },

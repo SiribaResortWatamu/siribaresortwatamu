@@ -15,7 +15,7 @@ import { coverImage } from "@/lib/images";
 import { formatMoney, humanise } from "@/lib/format";
 import type { SafariWithDetail } from "@/lib/types";
 
-export const metadata = { title: "Safaris" };
+export const metadata = { title: "Safaris & Excursions" };
 
 export default async function AdminSafarisPage() {
   const { data } = await supabaseAdmin()
@@ -29,7 +29,7 @@ export default async function AdminSafarisPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Safaris"
+        title="Safaris & Excursions"
         subtitle="Each safari gets its own page, built from the shared template."
         actions={
           <>

@@ -31,7 +31,7 @@ const REASONS = [
   },
   {
     icon: Compass,
-    title: "Safaris arranged in-house",
+    title: "Safaris & excursions arranged in-house",
     body: "Tsavo in two days, the Mara in three. We run our own safari desk, so your beach days and bush days are planned together.",
   },
   {
@@ -114,7 +114,7 @@ export default async function HomePage() {
               Book Your Stay
             </Link>
             <Link href="/safaris" className="btn btn-on-dark w-full sm:w-auto">
-              Explore Our Experiences
+              Explore Safaris &amp; Excursions
             </Link>
             <Link href="/transfers" className="btn btn-on-dark w-full sm:w-auto">
               Book a Transfer
@@ -307,9 +307,9 @@ export default async function HomePage() {
           <div className="shell">
             <SectionHeading
               eyebrow="Beyond the beach"
-              title="Safaris from the coast"
+              title="Safaris & excursions from the coast"
               intro="Tsavo is close enough for a two-day trip. The Mara is a short flight away. Both are arranged from our own safari desk."
-              action={{ href: "/safaris", label: "All safaris" }}
+              action={{ href: "/safaris", label: "All safaris & excursions" }}
             />
 
             <div className="mt-14 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">

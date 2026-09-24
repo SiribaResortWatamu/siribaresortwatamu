@@ -13,7 +13,7 @@ import { formatDate, formatDateTime, formatMoney } from "@/lib/format";
 import { telLink, whatsappLink } from "@/lib/whatsapp";
 import type { SafariEnquiry } from "@/lib/types";
 
-export const metadata = { title: "Safari Enquiry" };
+export const metadata = { title: "Safari & Excursion Enquiry" };
 
 export default async function SafariEnquiryPage({
   params,
@@ -42,7 +42,7 @@ export default async function SafariEnquiryPage({
       <PageHeader
         title={enquiry.name}
         subtitle={`${enquiry.safari_name_snapshot} · ${enquiry.reference}`}
-        back={{ href: "/admin/safaris/enquiries", label: "Safari enquiries" }}
+        back={{ href: "/admin/safaris/enquiries", label: "Safari & excursion enquiries" }}
         actions={<StatusPill status={enquiry.status} />}
       />
 

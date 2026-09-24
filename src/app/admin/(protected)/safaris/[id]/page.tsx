@@ -37,7 +37,7 @@ export default async function EditSafariPage({
       <PageHeader
         title={safari.name}
         subtitle={`/safaris/${safari.slug}`}
-        back={{ href: "/admin/safaris", label: "Safaris" }}
+        back={{ href: "/admin/safaris", label: "Safaris & Excursions" }}
         actions={
           <div className="flex items-center gap-2">
             <StatusPill status={safari.status} />

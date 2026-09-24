@@ -49,7 +49,7 @@ const GROUPS = [
     title: "Content",
     items: [
       { href: "/admin/accommodation", label: "Accommodation", icon: BedDouble },
-      { href: "/admin/safaris", label: "Safaris", icon: Compass },
+      { href: "/admin/safaris", label: "Safaris & Excursions", icon: Compass },
       { href: "/admin/transfers", label: "Transfers", icon: Car },
       { href: "/admin/amenities", label: "Amenities", icon: Sparkles },
     ],
@@ -59,7 +59,7 @@ const GROUPS = [
     items: [
       {
         href: "/admin/safaris/enquiries",
-        label: "Safari enquiries",
+        label: "Enquiries",
         icon: Compass,
         badge: "enquiries",
       },

@@ -128,7 +128,7 @@ export default async function GuestDetailPage({
                       ? formatMoney(outstanding, bookings[0]?.currency ?? "KES")
                       : "Nothing owed",
                 },
-                { label: "Safari enquiries", value: String(enquiries.length) },
+                { label: "Safari & excursion enquiries", value: String(enquiries.length) },
                 { label: "Transfers", value: String(transfers.length) },
                 { label: "First seen", value: formatDateTime(guest.created_at) },
               ]}
@@ -182,7 +182,7 @@ export default async function GuestDetailPage({
           </Panel>
 
           {enquiries.length > 0 && (
-            <Panel title="Safari enquiries" bodyClassName="">
+            <Panel title="Safari & excursion enquiries" bodyClassName="">
               <TableWrap>
                 <thead>
                   <tr>
