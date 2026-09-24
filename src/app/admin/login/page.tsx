@@ -18,14 +18,15 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
+        {/*
+          No hint text here on purpose. Naming the backend, or explaining how
+          staff accounts get created, tells anyone who finds this page more
+          than they need. The reset link in the form covers the one thing a
+          locked-out member of staff actually needs.
+        */}
         <Suspense fallback={<div className="card h-80" />}>
           <LoginForm />
         </Suspense>
-
-        <p className="mt-6 text-center text-xs text-ink-muted">
-          Accounts are created by the owner in Supabase. If you cannot get in, ask for
-          a password reset.
-        </p>
       </div>
     </main>
   );
