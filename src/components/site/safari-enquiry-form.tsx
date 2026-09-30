@@ -9,6 +9,7 @@ import {
   ContactFields,
   Field,
   FormNotice,
+  Honeypot,
   SuccessPanel,
 } from "@/components/site/form-parts";
 import { toDateKey } from "@/lib/format";
@@ -44,6 +45,7 @@ export function SafariEnquiryForm({
   return (
     <form action={formAction} className="@container card p-7 sm:p-8">
       <input type="hidden" name="safariId" value={safari.id} />
+      <Honeypot />
 
       <h3 className="font-display text-xl font-semibold">Enquire about this safari</h3>
       <p className="mt-2 text-sm leading-relaxed text-ink-muted">

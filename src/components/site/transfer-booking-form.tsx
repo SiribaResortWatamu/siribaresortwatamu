@@ -9,6 +9,7 @@ import {
   ContactFields,
   Field,
   FormNotice,
+  Honeypot,
   SuccessPanel,
 } from "@/components/site/form-parts";
 import { formatMoney, toDateKey } from "@/lib/format";
@@ -54,6 +55,7 @@ export function TransferBookingForm({
   return (
     <form action={formAction} className="@container card p-7 sm:p-8">
       <input type="hidden" name="transferId" value={service.id} />
+      <Honeypot />
 
       <h3 className="font-display text-xl font-semibold">Request this transfer</h3>
       <p className="mt-2 text-sm leading-relaxed text-ink-muted">

@@ -8,6 +8,7 @@ import { WhatsAppIcon } from "@/components/icons";
 import { addDays, parseISO, startOfDay } from "date-fns";
 import { createBooking } from "@/app/actions/public";
 import { IDLE } from "@/lib/action-state";
+import { Honeypot } from "@/components/site/form-parts";
 import { Price } from "@/components/site/price";
 import { formatDate, formatMoney, toDateKey } from "@/lib/format";
 import { whatsappLink } from "@/lib/whatsapp";
@@ -112,6 +113,7 @@ export function BookingWidget({
   return (
     <form action={formAction} className="card">
       <input type="hidden" name="apartmentId" value={apartment.id} />
+      <Honeypot />
       <input
         type="hidden"
         name="checkIn"

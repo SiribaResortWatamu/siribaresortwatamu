@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { addHours, formatISO } from "date-fns";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { overRateLimit } from "@/lib/rate-limit";
 import { getSettings } from "@/lib/data/settings";
 import { quoteStay, quoteTransfer, nightsBetween } from "@/lib/pricing";
 import { sendMail } from "@/lib/email";
@@ -106,6 +107,18 @@ export async function createBooking(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  // Honeypot: real people leave this hidden field empty. Answer as if it
+  // worked, so a bot learns nothing from the response.
+  if (formData.get("company")) {
+    return { status: "success", message: "Booking request received" };
+  }
+
+  if (await overRateLimit("booking")) {
+    return fail(
+      "That is a lot of requests in a short time. Please wait a few minutes, or send us a WhatsApp.",
+    );
+  }
+
   const parsed = bookingSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return fail("Please check the highlighted fields.", fieldErrors(parsed.error));
@@ -318,6 +331,18 @@ export async function createSafariEnquiry(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  // Honeypot: real people leave this hidden field empty. Answer as if it
+  // worked, so a bot learns nothing from the response.
+  if (formData.get("company")) {
+    return { status: "success", message: "Safari enquiry sent" };
+  }
+
+  if (await overRateLimit("safari")) {
+    return fail(
+      "That is a lot of requests in a short time. Please wait a few minutes, or send us a WhatsApp.",
+    );
+  }
+
   const raw = Object.fromEntries(formData);
   const parsed = safariSchema.safeParse({
     ...raw,
@@ -443,6 +468,18 @@ export async function createTransferRequest(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  // Honeypot: real people leave this hidden field empty. Answer as if it
+  // worked, so a bot learns nothing from the response.
+  if (formData.get("company")) {
+    return { status: "success", message: "Transfer request sent" };
+  }
+
+  if (await overRateLimit("transfer")) {
+    return fail(
+      "That is a lot of requests in a short time. Please wait a few minutes, or send us a WhatsApp.",
+    );
+  }
+
   const parsed = transferSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return fail("Please check the highlighted fields.", fieldErrors(parsed.error));
@@ -580,6 +617,12 @@ export async function sendContactMessage(
   // Honeypot: real people leave this hidden field empty.
   if (formData.get("company")) {
     return { status: "success", message: "Message sent" };
+  }
+
+  if (await overRateLimit("contact")) {
+    return fail(
+      "That is a lot of requests in a short time. Please wait a few minutes, or send us a WhatsApp.",
+    );
   }
 
   const parsed = messageSchema.safeParse(Object.fromEntries(formData));

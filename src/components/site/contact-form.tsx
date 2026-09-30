@@ -6,6 +6,7 @@ import { sendContactMessage } from "@/app/actions/public";
 import { IDLE } from "@/lib/action-state";
 import {
   ContactFields,
+  Honeypot,
   Field,
   FormNotice,
   SuccessPanel,
@@ -27,13 +28,7 @@ export function ContactForm() {
         usually reply the same day.
       </p>
 
-      {/* Honeypot: hidden from people, tempting to bots. */}
-      <div aria-hidden className="absolute -left-[9999px]">
-        <label>
-          Company
-          <input name="company" tabIndex={-1} autoComplete="off" />
-        </label>
-      </div>
+      <Honeypot />
 
       <div className="mt-7 space-y-4">
         <ContactFields errors={errors} />

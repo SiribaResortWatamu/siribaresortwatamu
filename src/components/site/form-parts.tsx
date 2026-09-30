@@ -98,6 +98,24 @@ export function SuccessPanel({
 }
 
 /** Name / email / phone / WhatsApp — identical across all three forms. */
+/**
+ * A field nobody can see and bots fill in anyway.
+ *
+ * Kept off-screen rather than `display:none`, because the better scrapers
+ * skip hidden inputs. The server treats any value here as a bot and returns
+ * the ordinary success message, so nothing is learned from the response.
+ */
+export function Honeypot() {
+  return (
+    <div aria-hidden className="absolute -left-[9999px]">
+      <label>
+        Company
+        <input name="company" tabIndex={-1} autoComplete="off" />
+      </label>
+    </div>
+  );
+}
+
 export function ContactFields({
   errors,
   nameLabel = "Full name",
