@@ -7,16 +7,12 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/auth";
 import { actionError, actionSuccess, type ActionState } from "@/lib/action-state";
 import {
-  DOCUMENT_LABELS,
   cleanLines,
   computeTotals,
   defaultDueDate,
   isDocumentType,
   paidAgainst,
 } from "@/lib/documents";
-import { sendMail } from "@/lib/email";
-import { formatDate, formatMoney } from "@/lib/format";
-import { siteUrl } from "@/lib/env";
 import type { BillingDocument } from "@/lib/types";
 
 /**
@@ -300,50 +296,4 @@ export async function createFollowUp(formData: FormData): Promise<void> {
 
   revalidatePath("/admin/documents");
   redirect(`/admin/documents/${created.id}?created=1`);
-}
-
-// =====================================================================
-// Email
-// =====================================================================
-export async function emailDocument(
-  _prev: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
-  await requireAdmin();
-  const id = String(formData.get("id") ?? "");
-
-  const { data } = await supabaseAdmin().from("documents").select("*").eq("id", id).maybeSingle();
-  const doc = data as BillingDocument | null;
-  if (!doc) return actionError("That document no longer exists.");
-  if (doc.status === "draft") return actionError("Issue the document before sending it.");
-  if (doc.status === "void") return actionError("This document has been voided.");
-
-  const to = textField(formData.get("to")) ?? doc.client_email;
-  if (!to || !to.includes("@")) return actionError("Add an email address to send to.");
-
-  const label = DOCUMENT_LABELS[doc.doc_type].singular;
-  const link = `${siteUrl()}/d/${doc.share_token}`;
-
-  const rows = [
-    { label: `${label} number`, value: doc.number ?? "" },
-    { label: "Amount", value: formatMoney(doc.total, doc.currency) },
-  ];
-  if (doc.doc_type === "invoice" && doc.due_date) {
-    rows.push({ label: "Due", value: formatDate(doc.due_date) });
-  }
-  if (doc.doc_type === "quotation" && doc.due_date) {
-    rows.push({ label: "Valid until", value: formatDate(doc.due_date) });
-  }
-
-  const result = await sendMail({
-    to,
-    subject: `${label} ${doc.number} — Siriba Resort Watamu`,
-    heading: `Your ${label.toLowerCase()} from Siriba Resort Watamu`,
-    intro: `Hello ${doc.client_name.split(" ")[0]}, your ${label.toLowerCase()} is ready. You can view, print or save it as a PDF from the link below.`,
-    rows,
-    cta: { label: `View ${label.toLowerCase()}`, href: link },
-  });
-
-  if (!result.sent) return actionError(result.error ?? "The email could not be sent.");
-  return actionSuccess(`Sent to ${to}`);
 }

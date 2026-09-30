@@ -41,7 +41,7 @@ export interface EditorValues {
   };
 }
 
-const PAYMENT_METHODS = ["M-Pesa", "Bank transfer", "Cash", "Card", "Airbnb / Booking.com", "Other"];
+const PAYMENT_METHODS = ["M-Pesa", "M-Pesa Paybill", "Bank transfer", "Cash", "Card", "Airbnb / Booking.com", "Other"];
 
 const BLANK_LINE: DocumentLine = { description: "", quantity: 1, unit_price: 0 };
 

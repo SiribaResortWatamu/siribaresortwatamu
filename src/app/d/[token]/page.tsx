@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { DocumentSheet } from "@/components/documents/document-sheet";
-import { PrintButton } from "@/components/documents/print-button";
+import { DownloadButton } from "@/components/documents/download-button";
 import { loadDocumentContext } from "@/lib/data/documents";
 import { getSettings } from "@/lib/data/settings";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -40,11 +40,17 @@ export default async function SharedDocumentPage({
   if (!settings) notFound();
 
   return (
-    <div className="min-h-screen bg-sand px-4 py-8 print:bg-white print:p-0">
-      <div className="mx-auto mb-5 flex max-w-[820px] justify-end print:hidden">
-        <PrintButton />
+    <>
+      <div className="min-h-screen bg-sand px-4 py-8 print:hidden">
+        <div className="mx-auto mb-5 flex max-w-[820px] justify-end">
+          <DownloadButton token={doc.share_token} />
+        </div>
+        <DocumentSheet doc={doc} settings={settings} {...context} />
       </div>
-      <DocumentSheet doc={doc} settings={settings} {...context} />
-    </div>
+      {/* Printing the page is switched off: the PDF is the copy to keep. */}
+      <p className="hidden p-10 text-center text-sm print:block">
+        Please use the Download PDF button to save this document.
+      </p>
+    </>
   );
 }

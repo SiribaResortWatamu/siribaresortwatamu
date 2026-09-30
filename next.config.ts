@@ -5,6 +5,9 @@ const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   : undefined;
 
 const nextConfig: NextConfig = {
+  // Uses Node APIs and its own font/layout engine; bundling it breaks PDF output.
+  serverExternalPackages: ["@react-pdf/renderer"],
+
   images: {
     remotePatterns: [
       // Uploaded media in the public Supabase Storage bucket.

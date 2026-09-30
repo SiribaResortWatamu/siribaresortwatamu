@@ -167,3 +167,27 @@ export function defaultDueDate(type: DocumentType, from = new Date()): string | 
   const d = String(due.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
+
+/**
+ * What has been paid against an invoice, and what is left. For an invoice
+ * that is its own receipts; for a receipt it is the invoice it settles.
+ * Anything else (a quotation, a receipt with no invoice) has no balance.
+ */
+export function invoiceBalance(
+  doc: Pick<BillingDocument, "doc_type" | "total">,
+  parent: Pick<BillingDocument, "doc_type" | "total"> | null,
+  receipts: Pick<BillingDocument, "total" | "status">[],
+): { paid: number; balance: number | null } {
+  const paid = paidAgainst(receipts);
+  const invoiceTotal =
+    doc.doc_type === "invoice"
+      ? Number(doc.total)
+      : parent?.doc_type === "invoice"
+        ? Number(parent.total)
+        : null;
+
+  return {
+    paid,
+    balance: invoiceTotal === null ? null : Math.max(0, round(invoiceTotal - paid)),
+  };
+}

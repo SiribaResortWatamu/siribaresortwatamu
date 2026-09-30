@@ -147,7 +147,7 @@ export function TransferRequestEditor({
               name="paymentMethod"
               className="input"
               defaultValue={request.payment_method ?? ""}
-              placeholder="M-Pesa, cash, transfer"
+              placeholder="M-Pesa, Paybill, cash, transfer"
             />
           </AdminField>
           <AdminField label="Reference">

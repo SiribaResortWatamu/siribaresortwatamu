@@ -166,6 +166,7 @@ export function PaymentForm({ booking }: { booking: Booking }) {
             />
             <datalist id="payment-methods">
               <option value="M-Pesa" />
+              <option value="M-Pesa Paybill" />
               <option value="Bank transfer" />
               <option value="Cash" />
               <option value="Card" />

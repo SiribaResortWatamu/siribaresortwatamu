@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
-import { ExternalLink } from "lucide-react";
 import { WhatsAppIcon } from "@/components/icons";
 import { PageHeader, Panel, StatusPill } from "@/components/admin/ui";
 import { SubmitButton } from "@/components/admin/form";
 import { CopyField } from "@/components/admin/copy-field";
-import { DocumentEmailForm } from "@/components/admin/document-email-form";
+import { DocumentSendPanel } from "@/components/admin/document-send-panel";
+import { DownloadButton } from "@/components/documents/download-button";
 import { DocumentEditor, type EditorValues } from "@/components/admin/document-editor";
 import { DocumentSheet } from "@/components/documents/document-sheet";
 import {
@@ -19,7 +19,7 @@ import { DOCUMENT_LABELS, paidAgainst } from "@/lib/documents";
 import { loadDocumentContext } from "@/lib/data/documents";
 import { getSettings } from "@/lib/data/settings";
 import { siteUrl } from "@/lib/env";
-import { formatMoney } from "@/lib/format";
+import { formatDate, formatMoney } from "@/lib/format";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { whatsappLink } from "@/lib/whatsapp";
 import type { BillingDocument } from "@/lib/types";
@@ -65,6 +65,23 @@ export default async function DocumentDetailPage({
     doc.client_phone,
     `Hello ${doc.client_name.split(" ")[0]}, here is your ${label.singular.toLowerCase()} ${doc.number ?? ""} from ${settings.property_name}: ${shareUrl}`,
   );
+
+  const dueLine =
+    doc.due_date && doc.doc_type !== "receipt"
+      ? `${doc.doc_type === "quotation" ? "Valid until" : "Payment due"}: ${formatDate(doc.due_date)}`
+      : null;
+  const emailMessage = [
+    `Hello ${doc.client_name.split(" ")[0]},`,
+    "",
+    `Please find your ${label.singular.toLowerCase()} ${doc.number ?? ""} from ${settings.property_name} for ${formatMoney(doc.total, doc.currency)}.`,
+    ...(dueLine ? [dueLine] : []),
+    "",
+    "You can view it and download the PDF here:",
+    shareUrl,
+    "",
+    "Kind regards,",
+    settings.property_name,
+  ].join("\n");
 
   const source = doc.booking_id
     ? { href: `/admin/bookings/${doc.booking_id}`, label: "Booking" }
@@ -176,15 +193,7 @@ export default async function DocumentDetailPage({
           <Panel title="Share">
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
-                <a
-                  href={shareUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary btn-sm"
-                >
-                  <ExternalLink size={14} strokeWidth={1.8} />
-                  Open to print / save PDF
-                </a>
+                <DownloadButton token={doc.share_token} />
                 {wa && doc.status === "issued" && (
                   <a
                     href={wa}
@@ -199,7 +208,11 @@ export default async function DocumentDetailPage({
               </div>
               <CopyField label="Client link" value={shareUrl} />
               {doc.status === "issued" && (
-                <DocumentEmailForm id={doc.id} email={doc.client_email ?? ""} />
+                <DocumentSendPanel
+                  email={doc.client_email ?? ""}
+                  subject={`${label.singular} ${doc.number} from ${settings.property_name}`}
+                  message={emailMessage}
+                />
               )}
             </div>
           </Panel>

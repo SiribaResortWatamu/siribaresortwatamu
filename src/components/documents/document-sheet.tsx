@@ -1,4 +1,4 @@
-import { DOCUMENT_LABELS, lineTotal, paidAgainst } from "@/lib/documents";
+import { DOCUMENT_LABELS, invoiceBalance, lineTotal } from "@/lib/documents";
 import { formatDate, formatMoney } from "@/lib/format";
 import { resolveImage } from "@/lib/images";
 import type { BillingDocument, SiteSettings } from "@/lib/types";
@@ -29,15 +29,7 @@ export function DocumentSheet({
   const logo = resolveImage(settings.logo_path) ?? "/logo.png";
   const money = (n: number) => formatMoney(n, doc.currency, { decimals: true });
 
-  const paid = paidAgainst(receipts);
-  const invoiceTotal =
-    doc.doc_type === "invoice"
-      ? Number(doc.total)
-      : parent?.doc_type === "invoice"
-        ? Number(parent.total)
-        : null;
-  const balance =
-    invoiceTotal === null ? null : Math.max(0, Math.round((invoiceTotal - paid) * 100) / 100);
+  const { paid, balance } = invoiceBalance(doc, parent, receipts);
 
   const dateLabel =
     doc.doc_type === "quotation" ? "Valid until" : doc.doc_type === "invoice" ? "Due" : null;
@@ -45,8 +37,8 @@ export function DocumentSheet({
   return (
     // The sheet is shown at very different widths (full page for a client, a
     // narrow column in the dashboard), so its layout follows its own width.
-    <div className="@container">
-      <article className="relative mx-auto w-full max-w-[820px] bg-white p-6 text-[0.9rem] leading-relaxed text-ink shadow-sm @xl:p-12 print:max-w-none print:p-0 print:shadow-none">
+    <div className="@container print:hidden">
+      <article className="relative mx-auto w-full max-w-[820px] bg-white p-6 text-[0.9rem] leading-relaxed text-ink shadow-sm @xl:p-12">
         {doc.status === "void" && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <span className="-rotate-12 rounded-xl border-4 border-[#a3402c]/40 px-8 py-2 font-display text-6xl font-semibold tracking-widest text-[#a3402c]/30">
