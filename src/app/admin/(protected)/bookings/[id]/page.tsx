@@ -11,6 +11,7 @@ import {
 } from "@/components/admin/ui";
 import { BookingEditor, PaymentForm } from "@/components/admin/booking-editors";
 import { SubmitButton } from "@/components/admin/form";
+import { SourceDocuments } from "@/components/admin/source-documents";
 import { setBookingStatus, setPaymentStatus } from "@/app/actions/admin/bookings";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { formatDate, formatDateTime, formatMoney, humanise } from "@/lib/format";
@@ -340,6 +341,7 @@ export default async function BookingDetailPage({
         </div>
 
         <div className="space-y-6">
+          <SourceDocuments kind="booking" id={booking.id} />
           <PaymentForm booking={booking} />
           <BookingEditor booking={booking} />
         </div>

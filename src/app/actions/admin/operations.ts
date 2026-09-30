@@ -371,6 +371,7 @@ export async function saveSettings(
     hold_duration_hours: Math.max(0, numberField(formData.get("hold_duration_hours"), 3)),
     booking_terms: textField(formData.get("booking_terms")),
     cancellation_policy: textField(formData.get("cancellation_policy")),
+    payment_instructions: textField(formData.get("payment_instructions")),
     check_in_time: textField(formData.get("check_in_time")),
     check_out_time: textField(formData.get("check_out_time")),
     default_deposit_percent: Math.min(

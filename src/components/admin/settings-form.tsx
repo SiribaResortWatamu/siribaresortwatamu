@@ -216,6 +216,18 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
                 defaultValue={settings.cancellation_policy ?? ""}
               />
             </AdminField>
+
+            <AdminField
+              label="Payment instructions"
+              hint="printed on invoices — bank, M-Pesa, etc."
+            >
+              <textarea
+                name="payment_instructions"
+                rows={4}
+                className="textarea"
+                defaultValue={settings.payment_instructions ?? ""}
+              />
+            </AdminField>
           </FormSection>
 
           {/* Pricing --------------------------------------------------- */}

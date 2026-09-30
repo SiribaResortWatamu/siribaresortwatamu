@@ -8,6 +8,7 @@ import {
   StatusPill,
 } from "@/components/admin/ui";
 import { EnquiryEditor } from "@/components/admin/enquiry-editor";
+import { SourceDocuments } from "@/components/admin/source-documents";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { formatDate, formatDateTime, formatMoney } from "@/lib/format";
 import { telLink, whatsappLink } from "@/lib/whatsapp";
@@ -120,7 +121,10 @@ export default async function SafariEnquiryPage({
           </Panel>
         </div>
 
-        <EnquiryEditor enquiry={enquiry} />
+        <div className="space-y-6">
+          <SourceDocuments kind="enquiry" id={enquiry.id} />
+          <EnquiryEditor enquiry={enquiry} />
+        </div>
       </div>
     </div>
   );

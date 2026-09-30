@@ -8,6 +8,7 @@ import {
   StatusPill,
 } from "@/components/admin/ui";
 import { TransferRequestEditor } from "@/components/admin/transfer-request-editor";
+import { SourceDocuments } from "@/components/admin/source-documents";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { formatDate, formatDateTime, formatMoney, formatTime } from "@/lib/format";
 import { telLink, whatsappLink } from "@/lib/whatsapp";
@@ -179,11 +180,14 @@ export default async function TransferRequestPage({
           </Panel>
         </div>
 
-        <TransferRequestEditor
-          request={request}
-          drivers={drivers}
-          vehicles={vehicles}
-        />
+        <div className="space-y-6">
+          <SourceDocuments kind="transfer" id={request.id} />
+          <TransferRequestEditor
+            request={request}
+            drivers={drivers}
+            vehicles={vehicles}
+          />
+        </div>
       </div>
     </div>
   );

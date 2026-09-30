@@ -395,6 +395,7 @@ export interface SiteSettings {
   hold_duration_hours: number;
   booking_terms: string | null;
   cancellation_policy: string | null;
+  payment_instructions: string | null;
   check_in_time: string | null;
   check_out_time: string | null;
   default_deposit_percent: number;
@@ -447,4 +448,48 @@ export interface DashboardStats {
   transfer_requests: number;
   unread_messages: number;
   rooms_needing_clean: number;
+}
+
+// ---------------------------------------------------------------------
+// Documents (quotations, invoices, receipts)
+// ---------------------------------------------------------------------
+export type DocumentType = "quotation" | "invoice" | "receipt";
+export type DocumentStatus = "draft" | "issued" | "void";
+
+export interface DocumentLine {
+  description: string;
+  quantity: number;
+  unit_price: number;
+}
+
+export interface BillingDocument {
+  id: string;
+  doc_type: DocumentType;
+  status: DocumentStatus;
+  number: string | null;
+  share_token: string;
+  booking_id: string | null;
+  transfer_booking_id: string | null;
+  safari_enquiry_id: string | null;
+  guest_id: string | null;
+  parent_id: string | null;
+  client_name: string;
+  client_email: string | null;
+  client_phone: string | null;
+  client_address: string | null;
+  issue_date: string | null;
+  due_date: string | null;
+  currency: string;
+  line_items: DocumentLine[];
+  subtotal: number;
+  discount: number;
+  total: number;
+  payment_method: string | null;
+  payment_reference: string | null;
+  payment_date: string | null;
+  notes: string | null;
+  terms: string | null;
+  voided_at: string | null;
+  created_at: string;
+  updated_at: string;
 }

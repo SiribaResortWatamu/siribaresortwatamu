@@ -206,6 +206,9 @@ const STATUS_TONES: Record<string, Tone> = {
   cleaning: "amber",
   ready: "green",
   maintenance: "red",
+  // Documents
+  issued: "green",
+  void: "red",
   // Resources
   active: "green",
   inactive: "neutral",

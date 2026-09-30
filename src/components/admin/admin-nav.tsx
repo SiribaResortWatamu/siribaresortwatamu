@@ -9,6 +9,7 @@ import {
   Car,
   Compass,
   ExternalLink,
+  FileText,
   LayoutDashboard,
   LogOut,
   Mail,
@@ -21,6 +22,7 @@ import {
 } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { NotificationCenter } from "@/components/admin/notification-center";
 import { cn } from "@/lib/utils";
 
 interface Badges {
@@ -43,6 +45,7 @@ const GROUPS = [
     items: [
       { href: "/admin/bookings", label: "Bookings", icon: BedDouble, badge: "bookings" },
       { href: "/admin/guests", label: "Guests", icon: Users },
+      { href: "/admin/documents", label: "Documents", icon: FileText },
     ],
   },
   {
@@ -171,6 +174,7 @@ export function AdminNav({
         </nav>
 
         <div className="border-t border-line px-3 py-4">
+          <NotificationCenter />
           <a
             href="/"
             target="_blank"
