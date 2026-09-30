@@ -45,6 +45,13 @@ const PAYMENT_METHODS = ["M-Pesa", "M-Pesa Paybill", "Bank transfer", "Cash", "C
 
 const BLANK_LINE: DocumentLine = { description: "", quantity: 1, unit_price: 0 };
 
+const CURRENCIES: [string, string][] = [
+  ["KES", "Kenyan shilling"],
+  ["USD", "US dollar"],
+  ["EUR", "Euro"],
+  ["GBP", "British pound"],
+];
+
 export function DocumentEditor({ values }: { values: EditorValues }) {
   const [state, formAction] = useActionState(saveDocument, IDLE);
   const errors = state.status === "error" ? (state.fieldErrors ?? {}) : {};
@@ -57,6 +64,12 @@ export function DocumentEditor({ values }: { values: EditorValues }) {
   const [discount, setDiscount] = useState(values.discount);
   const [currency, setCurrency] = useState(values.currency);
 
+  // A document raised from a booking may already carry another currency;
+  // keep it selectable rather than silently switching it.
+  const currencyOptions = CURRENCIES.some(([code]) => code === values.currency)
+    ? CURRENCIES
+    : [...CURRENCIES, [values.currency, "Current currency"] as [string, string]];
+
   const totals = computeTotals(
     lines.filter((l) => l.description.trim() && l.quantity > 0),
     discount,
@@ -66,7 +79,7 @@ export function DocumentEditor({ values }: { values: EditorValues }) {
     setLines((current) => current.map((l, i) => (i === index ? { ...l, ...patch } : l)));
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction} className="@container space-y-6">
       {values.id && <input type="hidden" name="id" value={values.id} />}
       <input type="hidden" name="docType" value={values.docType} />
       <input type="hidden" name="bookingId" value={values.links.bookingId ?? ""} />
@@ -79,7 +92,7 @@ export function DocumentEditor({ values }: { values: EditorValues }) {
       <FormFeedback state={state} />
 
       <FormSection title="Client">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 @lg:grid-cols-2">
           <AdminField label="Name" required error={errors.clientName}>
             <input
               name="clientName"
@@ -110,28 +123,30 @@ export function DocumentEditor({ values }: { values: EditorValues }) {
       </FormSection>
 
       <FormSection title={`${label.singular} details`}>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 @xl:grid-cols-3">
           <AdminField label="Currency" required error={errors.currency}>
-            <input
+            <select
               name="currency"
-              className="input uppercase"
-              maxLength={3}
+              className="select"
               required
               value={currency}
-              onChange={(e) => setCurrency(e.target.value.toUpperCase())}
-            />
+              onChange={(e) => setCurrency(e.target.value)}
+            >
+              {currencyOptions.map(([code, name]) => (
+                <option key={code} value={code}>
+                  {code} — {name}
+                </option>
+              ))}
+            </select>
           </AdminField>
-          <AdminField
-            label="Date"
-            hint="defaults to the day it is issued"
-            error={errors.issueDate}
-          >
+          <AdminField label="Date" error={errors.issueDate}>
             <input
               name="issueDate"
               type="date"
               className="input"
               defaultValue={values.issueDate}
             />
+            <p className="mt-1 text-xs text-ink-muted">Defaults to the day it is issued.</p>
           </AdminField>
           {!isReceipt && (
             <AdminField
@@ -149,7 +164,7 @@ export function DocumentEditor({ values }: { values: EditorValues }) {
         </div>
 
         {isReceipt && (
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 @xl:grid-cols-3">
             <AdminField label="Payment method">
               <select
                 name="paymentMethod"
@@ -190,7 +205,7 @@ export function DocumentEditor({ values }: { values: EditorValues }) {
         }
       >
         <div className="space-y-3">
-          <div className="hidden grid-cols-[1fr_5rem_8rem_7rem_2rem] gap-2 text-[0.7rem] tracking-[0.08em] text-ink-muted uppercase sm:grid">
+          <div className="hidden grid-cols-[1fr_5rem_8rem_7rem_2rem] gap-2 text-[0.7rem] tracking-[0.08em] text-ink-muted uppercase @xl:grid">
             <span>Description</span>
             <span>Qty</span>
             <span>Unit price</span>
@@ -201,11 +216,11 @@ export function DocumentEditor({ values }: { values: EditorValues }) {
           {lines.map((line, index) => (
             <div
               key={index}
-              className="grid grid-cols-2 gap-2 rounded-xl border border-line p-3 sm:grid-cols-[1fr_5rem_8rem_7rem_2rem] sm:items-center sm:border-0 sm:p-0"
+              className="grid grid-cols-2 gap-2 rounded-xl border border-line p-3 @xl:grid-cols-[1fr_5rem_8rem_7rem_2rem] @xl:items-center @xl:border-0 @xl:p-0"
             >
               <input
                 aria-label="Description"
-                className="input col-span-2 sm:col-span-1"
+                className="input col-span-2 @xl:col-span-1"
                 placeholder="Description"
                 value={line.description}
                 onChange={(e) => update(index, { description: e.target.value })}

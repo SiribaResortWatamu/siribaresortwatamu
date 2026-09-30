@@ -132,10 +132,12 @@ export default async function DocumentDetailPage({
           </p>
         )}
 
-        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-start">
+        {/* Below xl the two columns stack, and the Issue panel goes first so it
+            is not buried under a long form. */}
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
           <DocumentEditor values={values} />
 
-          <div className="space-y-6">
+          <div className="order-first space-y-6 xl:order-none">
             <Panel
               title="Issue"
               description="Issuing assigns the number and locks the document. It cannot be edited afterwards."
@@ -155,7 +157,7 @@ export default async function DocumentDetailPage({
                 </form>
               </div>
               <p className="mt-3 text-xs text-ink-muted">
-                Save any changes above before issuing.
+                Save any changes to the form before issuing.
               </p>
             </Panel>
             {source && (
@@ -184,12 +186,12 @@ export default async function DocumentDetailPage({
         actions={<StatusPill status={doc.status} />}
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr] lg:items-start">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-start">
         <div className="min-w-0 overflow-x-auto rounded-2xl border border-line bg-white">
           <DocumentSheet doc={doc} settings={settings} {...context} />
         </div>
 
-        <div className="space-y-6">
+        <div className="order-first space-y-6 xl:order-none">
           <Panel title="Share">
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
