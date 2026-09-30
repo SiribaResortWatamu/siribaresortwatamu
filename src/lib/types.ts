@@ -70,6 +70,7 @@ export interface Amenity {
   description: string | null;
   display_order: number;
   is_featured: boolean;
+  is_coming_soon: boolean;
   status: ContentStatus;
 }
 

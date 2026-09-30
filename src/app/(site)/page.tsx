@@ -63,7 +63,7 @@ export default async function HomePage() {
   const featuredApartments = pickFeatured(apartments, 3);
   const featuredSafaris = pickFeatured(safaris, 3);
   const featuredTransfers = pickFeatured(transfers, 3);
-  const featuredAmenities = amenities.filter((a) => a.is_featured).slice(0, 8);
+  const featuredAmenities = amenities.filter((a) => a.is_featured && !a.is_coming_soon).slice(0, 8);
   const wa = whatsappLink(
     settings.whatsapp,
     "Hello! I'd like to enquire about staying at Siriba Resort Watamu.",

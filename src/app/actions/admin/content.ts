@@ -428,6 +428,7 @@ export async function saveAmenity(
     description: textField(formData.get("description")),
     display_order: numberField(formData.get("display_order")),
     is_featured: formData.get("is_featured") === "on",
+    is_coming_soon: formData.get("is_coming_soon") === "on",
     status: status.success ? status.data : "published",
   };
 
@@ -445,6 +446,7 @@ export async function saveAmenity(
   }
 
   revalidatePath("/amenities");
+  revalidatePath("/accommodation", "layout");
   revalidatePath("/");
   revalidatePath("/admin/amenities");
 

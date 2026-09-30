@@ -98,6 +98,22 @@ export function AmenityForm({ amenity }: { amenity?: Amenity }) {
           </span>
         </label>
 
+        <label className="flex cursor-pointer items-start gap-2.5 text-sm">
+          <input
+            type="checkbox"
+            name="is_coming_soon"
+            defaultChecked={amenity?.is_coming_soon ?? false}
+            className="mt-0.5 h-4 w-4 shrink-0 accent-[#2c6e6b]"
+          />
+          <span>
+            Coming soon
+            <span className="block text-xs text-ink-muted">
+              Still being built. It shows on the website with a &ldquo;Coming soon&rdquo;
+              label, in its own section, and is left off the homepage.
+            </span>
+          </span>
+        </label>
+
         <div className="flex gap-2">
           <SubmitButton className="flex-1">
             {amenity ? "Save amenity" : "Add amenity"}

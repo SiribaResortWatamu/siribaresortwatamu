@@ -48,7 +48,15 @@ export default async function AmenitiesPage({
         }
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr] lg:items-start">
+      {/* The side panel keeps a fixed, slim width so the table always has room
+          for its Edit and Delete buttons; the edit form needs a little more. */}
+      <div
+        className={
+          edit
+            ? "grid gap-6 lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-start"
+            : "grid gap-6 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start"
+        }
+      >
         <Panel bodyClassName="">
           {amenities.length === 0 ? (
             <EmptyState
@@ -89,6 +97,7 @@ export default async function AmenitiesPage({
                           )}
                         </div>
                         {amenity.is_featured && <Tag tone="terracotta">Featured</Tag>}
+                        {amenity.is_coming_soon && <Tag tone="amber">Coming soon</Tag>}
                       </div>
                     </Td>
                     <Td className="text-sm tabular-nums">{amenity.display_order}</Td>
@@ -125,10 +134,19 @@ export default async function AmenitiesPage({
           {edit ? (
             <AmenityForm key={edit} amenity={editing} />
           ) : (
-            <div className="panel p-6 text-sm leading-relaxed text-ink-muted">
-              Amenities appear on the Amenities page and in the grid on each
-              accommodation page. Mark the important ones as{" "}
-              <strong className="text-ink">featured</strong> to show them on the homepage.
+            <div className="panel space-y-3 p-5 text-sm leading-relaxed text-ink-muted">
+              <p>
+                Amenities appear on the Amenities page and in the grid on each
+                accommodation page.
+              </p>
+              <p>
+                Mark the important ones as <strong className="text-ink">featured</strong> to
+                show them on the homepage.
+              </p>
+              <p>
+                Still building one? Tick <strong className="text-ink">coming soon</strong> and
+                it shows with a label instead of being promised.
+              </p>
             </div>
           )}
         </div>

@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { AmenityIcon } from "@/components/site/amenity-icon";
+import { ComingSoonTag } from "@/components/site/coming-soon-tag";
 import { BookingWidget } from "@/components/site/booking-widget";
 import { Gallery } from "@/components/site/gallery";
 import { PageHero } from "@/components/site/page-hero";
@@ -170,7 +171,10 @@ export default async function AccommodationDetailPage({
                         className="mt-0.5 shrink-0 text-ocean"
                       />
                       <div>
-                        <p className="text-[0.95rem] font-normal">{amenity.name}</p>
+                        <p className="text-[0.95rem] font-normal">
+                          {amenity.name}
+                          {amenity.is_coming_soon && <ComingSoonTag className="ml-2" />}
+                        </p>
                         {amenity.description && (
                           <p className="mt-0.5 text-sm text-ink-muted">
                             {amenity.description}

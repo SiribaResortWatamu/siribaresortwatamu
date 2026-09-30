@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AmenityIcon } from "@/components/site/amenity-icon";
+import { ComingSoonTag } from "@/components/site/coming-soon-tag";
 import { PageHero } from "@/components/site/page-hero";
 import { listAmenities } from "@/lib/data/content";
 
@@ -15,8 +16,12 @@ export const metadata: Metadata = {
 
 export default async function AmenitiesPage() {
   const amenities = await listAmenities();
-  const featured = amenities.filter((a) => a.is_featured);
-  const rest = amenities.filter((a) => !a.is_featured);
+  // Anything still being built is kept out of "included" and "on request" so
+  // the page never promises what is not there yet.
+  const available = amenities.filter((a) => !a.is_coming_soon);
+  const comingSoon = amenities.filter((a) => a.is_coming_soon);
+  const featured = available.filter((a) => a.is_featured);
+  const rest = available.filter((a) => !a.is_featured);
 
   return (
     <>
@@ -85,6 +90,37 @@ export default async function AmenitiesPage() {
                         />
                         <div>
                           <p className="text-[0.95rem]">{amenity.name}</p>
+                          {amenity.description && (
+                            <p className="mt-0.5 text-sm text-ink-muted">
+                              {amenity.description}
+                            </p>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {comingSoon.length > 0 && (
+                <div className={featured.length > 0 || rest.length > 0 ? "mt-20" : ""}>
+                  <div className="max-w-2xl">
+                    <p className="eyebrow">On the way</p>
+                    <h2 className="display-lg mt-3">Coming soon</h2>
+                  </div>
+
+                  <ul className="mt-10 grid gap-x-10 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+                    {comingSoon.map((amenity) => (
+                      <li key={amenity.id} className="flex items-start gap-3.5">
+                        <AmenityIcon
+                          name={amenity.icon}
+                          size={19}
+                          className="mt-0.5 shrink-0 text-ink-muted"
+                        />
+                        <div>
+                          <p className="text-[0.95rem]">
+                            {amenity.name} <ComingSoonTag className="ml-1" />
+                          </p>
                           {amenity.description && (
                             <p className="mt-0.5 text-sm text-ink-muted">
                               {amenity.description}
