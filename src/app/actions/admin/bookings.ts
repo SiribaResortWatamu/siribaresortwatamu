@@ -512,7 +512,7 @@ export async function createBlock(
   }
 
   revalidatePath("/admin/calendar");
-  revalidatePath("/accommodation");
+  revalidatePath("/accommodation", "layout");
 
   if (conflicts.length > 0 && created === 0) {
     return actionError(conflicts.join(" "));
@@ -536,7 +536,7 @@ export async function deleteBlock(formData: FormData): Promise<void> {
   await supabaseAdmin().from("blocked_dates").delete().eq("id", id);
 
   revalidatePath("/admin/calendar");
-  revalidatePath("/accommodation");
+  revalidatePath("/accommodation", "layout");
 }
 
 // =====================================================================

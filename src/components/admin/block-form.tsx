@@ -4,29 +4,33 @@ import { useActionState, useState } from "react";
 import { CalendarOff } from "lucide-react";
 import { createBlock } from "@/app/actions/admin/bookings";
 import { IDLE } from "@/lib/action-state";
-import {
-  AdminField,
-  FormFeedback,
-  FormSection,
-  SubmitButton,
-} from "@/components/admin/form";
+import { AdminField, FormFeedback, FormSection, SubmitButton } from "@/components/admin/form";
 import { toDateKey } from "@/lib/format";
 import type { Apartment } from "@/lib/types";
 
-/** Take dates off sale — for maintenance, an owner stay or a private event. */
-export function BlockForm({ apartments }: { apartments: Apartment[] }) {
+/**
+ * Take dates off sale — for maintenance, an owner stay or a private event.
+ *
+ * Shown two ways: on the calendar with a picker for any or all
+ * accommodations, or — given `apartment` — on one accommodation's own page,
+ * where the form is fixed to it.
+ */
+export function BlockForm({
+  apartments = [],
+  apartment,
+}: {
+  apartments?: Pick<Apartment, "id" | "name">[];
+  apartment?: Pick<Apartment, "id" | "name">;
+}) {
   const [state, formAction] = useActionState(createBlock, IDLE);
   const [selected, setSelected] = useState<string[]>([]);
   const errors = state.status === "error" ? (state.fieldErrors ?? {}) : {};
   const today = toDateKey(new Date());
 
-  const allSelected =
-    apartments.length > 0 && selected.length === apartments.length;
+  const allSelected = apartments.length > 0 && selected.length === apartments.length;
 
   const toggle = (id: string) =>
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
   return (
     <form action={formAction} className="space-y-4">
@@ -34,17 +38,15 @@ export function BlockForm({ apartments }: { apartments: Apartment[] }) {
 
       <FormSection
         title="Block dates"
-        description="Blocked nights cannot be booked, here or through a channel."
+        description={
+          apartment
+            ? `Takes ${apartment.name} off sale for these nights.`
+            : "Blocked nights cannot be booked, here or through a channel."
+        }
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <AdminField label="From" required error={errors.startDate}>
-            <input
-              name="startDate"
-              type="date"
-              className="input"
-              required
-              defaultValue={today}
-            />
+            <input name="startDate" type="date" className="input" required defaultValue={today} />
           </AdminField>
           <AdminField
             label="Until"
@@ -65,38 +67,42 @@ export function BlockForm({ apartments }: { apartments: Apartment[] }) {
           </select>
         </AdminField>
 
-        <AdminField label="Which accommodation?" required>
-          <label className="mb-2.5 flex cursor-pointer items-center gap-2.5 text-sm">
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={(event) =>
-                setSelected(event.target.checked ? apartments.map((a) => a.id) : [])
-              }
-              className="h-4 w-4 shrink-0 accent-[#2c6e6b]"
-            />
-            The entire property
-          </label>
+        {apartment ? (
+          <input type="hidden" name="apartmentIds" value={apartment.id} />
+        ) : (
+          <AdminField label="Which accommodation?" required>
+            <label className="mb-2.5 flex cursor-pointer items-center gap-2.5 text-sm">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={(event) =>
+                  setSelected(event.target.checked ? apartments.map((a) => a.id) : [])
+                }
+                className="h-4 w-4 shrink-0 accent-[#2c6e6b]"
+              />
+              The entire property
+            </label>
 
-          <div className="max-h-52 space-y-2 overflow-y-auto rounded-lg border border-line p-3">
-            {apartments.map((apartment) => (
-              <label
-                key={apartment.id}
-                className="flex cursor-pointer items-center gap-2.5 text-sm"
-              >
-                <input
-                  type="checkbox"
-                  name="apartmentIds"
-                  value={apartment.id}
-                  checked={selected.includes(apartment.id)}
-                  onChange={() => toggle(apartment.id)}
-                  className="h-4 w-4 shrink-0 accent-[#2c6e6b]"
-                />
-                {apartment.name}
-              </label>
-            ))}
-          </div>
-        </AdminField>
+            <div className="max-h-52 space-y-2 overflow-y-auto rounded-lg border border-line p-3">
+              {apartments.map((apartment) => (
+                <label
+                  key={apartment.id}
+                  className="flex cursor-pointer items-center gap-2.5 text-sm"
+                >
+                  <input
+                    type="checkbox"
+                    name="apartmentIds"
+                    value={apartment.id}
+                    checked={selected.includes(apartment.id)}
+                    onChange={() => toggle(apartment.id)}
+                    className="h-4 w-4 shrink-0 accent-[#2c6e6b]"
+                  />
+                  {apartment.name}
+                </label>
+              ))}
+            </div>
+          </AdminField>
+        )}
 
         <AdminField label="Note" hint="optional, for your own reference">
           <input name="note" className="input" placeholder="Repainting the terrace" />
@@ -108,9 +114,8 @@ export function BlockForm({ apartments }: { apartments: Apartment[] }) {
         </SubmitButton>
 
         <p className="text-xs text-ink-muted">
-          If a confirmed booking already occupies any of these nights, that accommodation
-          is skipped and you are told which — an existing guest is never quietly
-          displaced.
+          If a confirmed booking already occupies any of these nights, that accommodation is skipped
+          and you are told which — an existing guest is never quietly displaced.
         </p>
       </FormSection>
     </form>

@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
+import { CalendarOff } from "lucide-react";
 import Link from "next/link";
 import { PageHeader, StatusPill, Tag } from "@/components/admin/ui";
 import { ApartmentForm } from "@/components/admin/apartment-form";
+import { ApartmentBlocks } from "@/components/admin/apartment-blocks";
 import { SubmitButton } from "@/components/admin/form";
 import { setContentStatus } from "@/app/actions/admin/content";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -48,8 +50,12 @@ export default async function EditAccommodationPage({
         subtitle={`/accommodation/${apartment.slug}`}
         back={{ href: "/admin/accommodation", label: "Accommodation" }}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <StatusPill status={apartment.status} />
+            <a href="#blocked-dates" className="btn btn-outline btn-sm">
+              <CalendarOff size={14} strokeWidth={1.6} />
+              Block dates
+            </a>
             {apartment.status === "published" ? (
               <StatusForm id={apartment.id} status="hidden" label="Unpublish" />
             ) : (
@@ -101,6 +107,8 @@ export default async function EditAccommodationPage({
         amenities={(amenityRows as Amenity[]) ?? []}
         siteUrl={siteUrl()}
       />
+
+      <ApartmentBlocks apartmentId={apartment.id} apartmentName={apartment.name} />
     </div>
   );
 }
