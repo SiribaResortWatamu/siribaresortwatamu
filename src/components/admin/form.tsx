@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { CheckCircle2, Loader2, TriangleAlert } from "lucide-react";
 import type { ActionState } from "@/lib/action-state";
@@ -114,13 +114,24 @@ export function SubmitButton({
 
 /** Banner showing the outcome of the last submit. */
 export function FormFeedback({ state }: { state: ActionState }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Long forms keep this banner at the top while the Save button is further
+  // down, so without this a failed save looks like nothing happened at all.
+  useEffect(() => {
+    if (state.status !== "idle") {
+      ref.current?.scrollIntoView({ block: "center" });
+    }
+  }, [state]);
+
   if (state.status === "idle") return null;
 
   const isError = state.status === "error";
 
   return (
     <div
-      role="status"
+      ref={ref}
+      role={isError ? "alert" : "status"}
       className={cn(
         "flex items-start gap-3 rounded-xl px-4 py-3.5 text-sm",
         isError ? "bg-[#fbe1dc] text-[#a3402c]" : "bg-[#dff0e4] text-[#1f6b3a]",
