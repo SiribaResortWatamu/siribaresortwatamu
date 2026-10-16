@@ -29,6 +29,18 @@ export interface UnavailablePeriod {
   kind: "booking" | "channel" | "block";
 }
 
+/** The booking a new stay is being added to, used to prefill the form. */
+export interface LinkedFrom {
+  id: string;
+  reference: string;
+  apartmentId: string | null;
+  name: string;
+  email: string;
+  phone: string | null;
+  guests: number;
+  source: string;
+}
+
 const KIND_LABELS: Record<UnavailablePeriod["kind"], string> = {
   booking: "Direct booking",
   channel: "Synced from channel",
@@ -48,15 +60,22 @@ function overlaps(period: UnavailablePeriod, from: string, to: string): boolean 
 export function NewBookingForm({
   apartments,
   unavailable = {},
+  linkedFrom,
 }: {
   apartments: Apartment[];
   unavailable?: Record<string, UnavailablePeriod[]>;
+  linkedFrom?: LinkedFrom;
 }) {
   const [state, formAction] = useActionState(createAdminBooking, IDLE);
   const errors = state.status === "error" ? (state.fieldErrors ?? {}) : {};
 
   const today = toDateKey(new Date());
-  const [apartmentId, setApartmentId] = useState(apartments[0]?.id ?? "");
+  const [apartmentId, setApartmentId] = useState(
+    apartments.find((a) => a.id === linkedFrom?.apartmentId)?.id ?? apartments[0]?.id ?? "",
+  );
+  // A guest who already paid the cleaning fee on the first stay should not
+  // be charged it again, so it is waived unless staff say otherwise.
+  const [waiveCleaning, setWaiveCleaning] = useState(true);
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
 
@@ -64,8 +83,16 @@ export function NewBookingForm({
 
   const quote = useMemo(() => {
     if (!apartment || !checkIn || !checkOut || checkOut <= checkIn) return null;
-    return quoteStay(apartment, checkIn, checkOut);
-  }, [apartment, checkIn, checkOut]);
+    const full = quoteStay(apartment, checkIn, checkOut);
+    if (!linkedFrom || !waiveCleaning) return full;
+    return {
+      ...full,
+      cleaningFee: 0,
+      total: full.accommodationTotal,
+      depositRequired:
+        Math.round(full.accommodationTotal * (apartment.deposit_percent ?? 0)) / 100,
+    };
+  }, [apartment, checkIn, checkOut, linkedFrom, waiveCleaning]);
 
   const periods = useMemo(
     () => unavailable[apartmentId] ?? [],
@@ -98,6 +125,7 @@ export function NewBookingForm({
 
   return (
     <form action={formAction} className="space-y-6">
+      {linkedFrom && <input type="hidden" name="linkedFrom" value={linkedFrom.id} />}
       <FormFeedback state={state} />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-start">
@@ -144,7 +172,7 @@ export function NewBookingForm({
                 />
               </AdminField>
               <AdminField label="Guests" required error={errors.guests}>
-                <select name="guests" defaultValue="2" className="select">
+                <select name="guests" defaultValue={String(linkedFrom?.guests ?? 2)} className="select">
                   {Array.from(
                     { length: apartment?.max_guests ?? 8 },
                     (_, i) => i + 1,
@@ -198,6 +226,25 @@ export function NewBookingForm({
               </details>
             )}
 
+            {linkedFrom && (apartment?.cleaning_fee ?? 0) > 0 && (
+              <label className="flex cursor-pointer items-start gap-2.5 rounded-xl bg-sand-deep/70 px-4 py-3.5 text-sm">
+                <input
+                  type="checkbox"
+                  name="waiveCleaning"
+                  checked={waiveCleaning}
+                  onChange={(event) => setWaiveCleaning(event.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-[#2c6e6b]"
+                />
+                <span>
+                  Don&rsquo;t charge the cleaning fee again
+                  <span className="block text-xs text-ink-muted">
+                    {formatMoney(apartment?.cleaning_fee ?? 0, apartment?.currency)} was
+                    already charged on {linkedFrom.reference}.
+                  </span>
+                </span>
+              </label>
+            )}
+
             {quote && (
               <div className="rounded-xl bg-sand-deep/70 px-4 py-3.5 text-sm">
                 <div className="flex items-baseline justify-between">
@@ -226,15 +273,26 @@ export function NewBookingForm({
 
           <FormSection title="Guest">
             <AdminField label="Full name" required error={errors.name}>
-              <input name="name" className="input" required />
+              <input name="name" className="input" required defaultValue={linkedFrom?.name} />
             </AdminField>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <AdminField label="Email" required error={errors.email}>
-                <input name="email" type="email" className="input" required />
+                <input
+                  name="email"
+                  type="email"
+                  className="input"
+                  required
+                  defaultValue={linkedFrom?.email}
+                />
               </AdminField>
               <AdminField label="Phone" error={errors.phone}>
-                <input name="phone" type="tel" className="input" />
+                <input
+                  name="phone"
+                  type="tel"
+                  className="input"
+                  defaultValue={linkedFrom?.phone ?? ""}
+                />
               </AdminField>
             </div>
 
@@ -251,7 +309,7 @@ export function NewBookingForm({
         <aside className="space-y-6 lg:sticky lg:top-6">
           <FormSection title="Booking details">
             <AdminField label="Where did it come from?">
-              <select name="source" defaultValue="admin" className="select">
+              <select name="source" defaultValue={linkedFrom?.source ?? "admin"} className="select">
                 <option value="admin">Added by staff</option>
                 <option value="whatsapp">WhatsApp</option>
                 <option value="website">Website</option>

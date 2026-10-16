@@ -85,6 +85,9 @@ export async function createAdminBooking(
   const input = parsed.data;
   const db = supabaseAdmin();
 
+  const linkedFromRaw = String(formData.get("linkedFrom") ?? "");
+  const linkedFromId = z.uuid().safeParse(linkedFromRaw).success ? linkedFromRaw : null;
+
   const { data: apartmentRow } = await db
     .from("apartments")
     .select("*")
@@ -94,7 +97,20 @@ export async function createAdminBooking(
   const apartment = apartmentRow as Apartment | null;
   if (!apartment) return actionError("That accommodation no longer exists.");
 
-  const quote = quoteStay(apartment, input.checkIn, input.checkOut);
+  const baseQuote = quoteStay(apartment, input.checkIn, input.checkOut);
+
+  // Another stay for a guest who already paid the cleaning fee on the first
+  // one should not be charged it again. The deposit follows the new total.
+  const waiveCleaning = linkedFromId !== null && formData.get("waiveCleaning") === "on";
+  const quote = waiveCleaning
+    ? {
+        ...baseQuote,
+        cleaningFee: 0,
+        total: baseQuote.accommodationTotal,
+        depositRequired:
+          Math.round(baseQuote.accommodationTotal * (apartment.deposit_percent ?? 0)) / 100,
+      }
+    : baseQuote;
 
   // Staff may override the total for a negotiated rate; blank means "use the
   // calculated figure", and a typed figure is still bounded by the server.
@@ -109,6 +125,22 @@ export async function createAdminBooking(
     typeof depositField === "string" && depositField.trim()
       ? Math.max(0, numberField(depositField))
       : quote.depositRequired;
+
+  // Linking: join the source booking's group, starting one if it has none.
+  // The source is only updated after the new booking has saved, so a clash
+  // never leaves a half-made group behind.
+  let stayGroupId: string | null = null;
+  let sourceNeedsGroup = false;
+  if (linkedFromId) {
+    const { data: source } = await db
+      .from("bookings")
+      .select("id, stay_group_id")
+      .eq("id", linkedFromId)
+      .maybeSingle();
+    if (!source) return actionError("The booking you are adding a stay to no longer exists.");
+    stayGroupId = (source.stay_group_id as string | null) ?? crypto.randomUUID();
+    sourceNeedsGroup = !source.stay_group_id;
+  }
 
   const guest = await upsertGuest({
     name: input.name,
@@ -138,12 +170,18 @@ export async function createAdminBooking(
       source: input.source,
       notes: textField(formData.get("notes")),
       special_requests: textField(formData.get("specialRequests")),
+      stay_group_id: stayGroupId,
       confirmed_at: input.bookingStatus === "confirmed" ? new Date().toISOString() : null,
     })
     .select("id, booking_reference")
     .single();
 
   if (error) return actionError(describeBookingError(error));
+
+  if (sourceNeedsGroup && linkedFromId) {
+    await db.from("bookings").update({ stay_group_id: stayGroupId }).eq("id", linkedFromId);
+    revalidatePath(`/admin/bookings/${linkedFromId}`);
+  }
 
   revalidatePath("/admin/bookings");
   revalidatePath("/admin/calendar");

@@ -166,6 +166,8 @@ export interface Booking {
   special_requests: string | null;
   notes: string | null;
   external_uid: string | null;
+  /** Bookings sharing this id are linked stays of one visit. */
+  stay_group_id: string | null;
   confirmed_at: string | null;
   cancelled_at: string | null;
   created_at: string;

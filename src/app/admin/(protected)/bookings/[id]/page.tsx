@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Clock, Mail, Phone } from "lucide-react";
+import { CalendarPlus, Clock, Mail, Phone } from "lucide-react";
 import { WhatsAppIcon } from "@/components/icons";
 import {
   DescriptionList,
@@ -52,6 +52,21 @@ export default async function BookingDetailPage({
 
   const guest = guestRow as Guest | null;
   const history = (historyRows as Booking[]) ?? [];
+
+  // Other bookings that are part of the same visit, including this one.
+  const linkedStays = booking.stay_group_id
+    ? (((
+        await db
+          .from("bookings")
+          .select(
+            "id, booking_reference, check_in, check_out, nights, total_snapshot, amount_paid, balance, currency, booking_status",
+          )
+          .eq("stay_group_id", booking.stay_group_id)
+          .order("check_in")
+      ).data as Booking[]) ?? [])
+    : [];
+  const hasLinkedStays = linkedStays.length > 1;
+  const activeStays = linkedStays.filter((s) => s.booking_status !== "cancelled");
 
   const wa = whatsappLink(
     guest?.whatsapp ?? booking.guest_phone_snapshot,
@@ -173,7 +188,20 @@ export default async function BookingDetailPage({
 
       <div className="grid gap-6 lg:grid-cols-[1.25fr_1fr] lg:items-start">
         <div className="space-y-6">
-          <Panel title="The stay">
+          <Panel
+            title="The stay"
+            actions={
+              booking.booking_status !== "cancelled" && (
+                <Link
+                  href={`/admin/bookings/new?from=${booking.id}`}
+                  className="btn btn-outline btn-sm"
+                >
+                  <CalendarPlus size={14} strokeWidth={1.6} />
+                  Add another stay
+                </Link>
+              )
+            }
+          >
             <DescriptionList
               items={[
                 { label: "Reference", value: booking.booking_reference },
@@ -196,6 +224,79 @@ export default async function BookingDetailPage({
               ]}
             />
           </Panel>
+
+          {hasLinkedStays && (
+            <Panel
+              title="Linked stays"
+              description={`${booking.guest_name_snapshot}’s visit is split across ${linkedStays.length} bookings.`}
+              bodyClassName=""
+            >
+              <ul className="divide-y divide-line/70">
+                {linkedStays.map((stay) => {
+                  const isThis = stay.id === booking.id;
+                  return (
+                    <li
+                      key={stay.id}
+                      className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 text-sm"
+                    >
+                      <div className="min-w-0">
+                        {isThis ? (
+                          <span className="font-medium">{stay.booking_reference} (this one)</span>
+                        ) : (
+                          <Link
+                            href={`/admin/bookings/${stay.id}`}
+                            className="font-medium transition-colors hover:text-terracotta"
+                          >
+                            {stay.booking_reference}
+                          </Link>
+                        )}
+                        <span className="block text-xs text-ink-muted">
+                          {formatDate(stay.check_in, "d MMM")} → {formatDate(stay.check_out, "d MMM yyyy")}
+                          {" · "}
+                          {stay.nights} {stay.nights === 1 ? "night" : "nights"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="tabular-nums">
+                          {formatMoney(stay.total_snapshot, stay.currency)}
+                        </span>
+                        <StatusPill status={stay.booking_status} />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="border-t border-line bg-sand/40 px-5 py-3 text-sm">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-ink-muted">
+                    Together ({activeStays.reduce((n, s) => n + s.nights, 0)} nights)
+                  </span>
+                  <span className="font-display font-semibold">
+                    {formatMoney(
+                      activeStays.reduce((n, s) => n + Number(s.total_snapshot), 0),
+                      booking.currency,
+                    )}
+                  </span>
+                </div>
+                <div className="mt-1 flex items-baseline justify-between text-xs text-ink-muted">
+                  <span>
+                    Paid{" "}
+                    {formatMoney(
+                      activeStays.reduce((n, s) => n + Number(s.amount_paid), 0),
+                      booking.currency,
+                    )}
+                  </span>
+                  <span>
+                    Balance{" "}
+                    {formatMoney(
+                      activeStays.reduce((n, s) => n + Number(s.balance), 0),
+                      booking.currency,
+                    )}
+                  </span>
+                </div>
+              </div>
+            </Panel>
+          )}
 
           <Panel title="Money" description="Figures frozen at the time of booking.">
             <DescriptionList
@@ -341,7 +442,7 @@ export default async function BookingDetailPage({
         </div>
 
         <div className="space-y-6">
-          <SourceDocuments kind="booking" id={booking.id} />
+          <SourceDocuments kind="booking" id={booking.id} combined={hasLinkedStays} />
           <PaymentForm booking={booking} />
           <BookingEditor booking={booking} />
         </div>

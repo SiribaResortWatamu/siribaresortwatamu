@@ -18,9 +18,12 @@ const COLUMN = {
 export async function SourceDocuments({
   kind,
   id,
+  combined = false,
 }: {
   kind: keyof typeof COLUMN;
   id: string;
+  /** Linked stays exist, so one document can cover all of them. */
+  combined?: boolean;
 }) {
   const { column, param } = COLUMN[kind];
 
@@ -48,6 +51,21 @@ export async function SourceDocuments({
           </Link>
         ))}
       </div>
+
+      {combined && (
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3">
+          <span className="text-xs text-ink-muted">All linked stays on one:</span>
+          {(["quotation", "invoice"] as const).map((type) => (
+            <Link
+              key={type}
+              href={`/admin/documents/new?type=${type}&${param}=${id}&group=1`}
+              className="btn btn-outline btn-sm"
+            >
+              Combined {DOCUMENT_LABELS[type].singular.toLowerCase()}
+            </Link>
+          ))}
+        </div>
+      )}
 
       {documents.length > 0 && (
         <ul className="mt-4 space-y-2 border-t border-line pt-4">

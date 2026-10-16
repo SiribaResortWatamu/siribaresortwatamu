@@ -212,6 +212,9 @@ export default async function AdminBookingsPage({
                     <span className="block text-xs text-ink-muted">
                       {humanise(booking.source)}
                     </span>
+                    {booking.stay_group_id && (
+                      <span className="block text-xs text-terracotta-dark">Linked stay</span>
+                    )}
                   </Td>
                   <Td>
                     <span className="block font-medium">

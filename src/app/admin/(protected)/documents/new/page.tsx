@@ -25,9 +25,10 @@ export default async function NewDocumentPage({
     booking?: string;
     transfer?: string;
     enquiry?: string;
+    group?: string;
   }>;
 }) {
-  const { type, booking, transfer, enquiry } = await searchParams;
+  const { type, booking, transfer, enquiry, group } = await searchParams;
   if (!isDocumentType(type)) notFound();
 
   const db = supabaseAdmin();
@@ -43,6 +44,27 @@ export default async function NewDocumentPage({
     if (data) {
       const b = data as Booking;
       draft = draftFromBooking(b);
+
+      // One document for a guest's whole visit: the lines of every linked
+      // stay, in date order. Receipts stay per booking, since a payment is
+      // made against one of them.
+      if (group && type !== "receipt" && b.stay_group_id) {
+        const { data: siblings } = await db
+          .from("bookings")
+          .select("*")
+          .eq("stay_group_id", b.stay_group_id)
+          .neq("booking_status", "cancelled")
+          .order("check_in");
+        const stays = ((siblings as Booking[]) ?? []).filter((s) => s.currency === b.currency);
+        if (stays.length > 1) {
+          draft = {
+            ...draftFromBooking(stays[0]),
+            lines: stays.flatMap((s) => draftFromBooking(s).lines),
+            link: { booking_id: b.id, guest_id: b.guest_id },
+            notes: `Booking references ${stays.map((s) => s.booking_reference).join(", ")}`,
+          };
+        }
+      }
       paid = Number(b.amount_paid);
       payment = {
         method: b.payment_method ?? "",

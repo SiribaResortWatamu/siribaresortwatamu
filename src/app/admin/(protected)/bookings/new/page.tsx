@@ -2,10 +2,12 @@ import { format } from "date-fns";
 import { PageHeader } from "@/components/admin/ui";
 import {
   NewBookingForm,
+  type LinkedFrom,
   type UnavailablePeriod,
 } from "@/components/admin/new-booking-form";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import type { Apartment } from "@/lib/types";
+import { z } from "zod";
+import type { Apartment, Booking } from "@/lib/types";
 
 export const metadata = { title: "New Booking" };
 
@@ -13,8 +15,34 @@ export const metadata = { title: "New Booking" };
 // cached copy of the page.
 export const dynamic = "force-dynamic";
 
-export default async function NewBookingPage() {
+export default async function NewBookingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const { from } = await searchParams;
   const db = supabaseAdmin();
+
+  // "Add another stay": start from an existing booking so the guest and
+  // accommodation are already filled in.
+  let linkedFrom: LinkedFrom | undefined;
+  if (from && z.uuid().safeParse(from).success) {
+    const { data: source } = await db.from("bookings").select("*").eq("id", from).maybeSingle();
+    if (source) {
+      const b = source as Booking;
+      linkedFrom = {
+        id: b.id,
+        reference: b.booking_reference,
+        apartmentId: b.apartment_id,
+        name: b.guest_name_snapshot,
+        email: b.guest_email_snapshot,
+        phone: b.guest_phone_snapshot,
+        guests: b.guests_count,
+        source: b.source,
+      };
+    }
+  }
+
   const today = format(new Date(), "yyyy-MM-dd");
 
   const [{ data }, { data: bookingRows }, { data: blockRows }] = await Promise.all([
@@ -72,13 +100,22 @@ export default async function NewBookingPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="New booking"
-        subtitle="For reservations taken by phone, WhatsApp or in person."
-        back={{ href: "/admin/bookings", label: "Bookings" }}
+        title={linkedFrom ? "Add another stay" : "New booking"}
+        subtitle={
+          linkedFrom
+            ? `Another stay for ${linkedFrom.name}, linked to ${linkedFrom.reference}.`
+            : "For reservations taken by phone, WhatsApp or in person."
+        }
+        back={
+          linkedFrom
+            ? { href: `/admin/bookings/${linkedFrom.id}`, label: linkedFrom.reference }
+            : { href: "/admin/bookings", label: "Bookings" }
+        }
       />
       <NewBookingForm
         apartments={(data as Apartment[]) ?? []}
         unavailable={unavailable}
+        linkedFrom={linkedFrom}
       />
     </div>
   );
