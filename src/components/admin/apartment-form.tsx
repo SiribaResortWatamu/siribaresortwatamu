@@ -16,6 +16,7 @@ import {
 } from "@/components/admin/form";
 import { PhotoManager } from "@/components/admin/photo-manager";
 import { CopyField } from "@/components/admin/copy-field";
+import { formatDateTime } from "@/lib/format";
 import type { Amenity, ApartmentWithPhotos } from "@/lib/types";
 
 const PROPERTY_TYPES = [
@@ -48,6 +49,13 @@ export function ApartmentForm({
   const [state, formAction] = useActionState(saveApartment, IDLE);
   const errors = state.status === "error" ? (state.fieldErrors ?? {}) : {};
   const isNew = !apartment;
+  // Which channels this accommodation is saved as importing from.
+  const channels = [
+    apartment?.airbnb_ical_url && "Airbnb",
+    apartment?.booking_com_ical_url && "Booking.com",
+  ]
+    .filter(Boolean)
+    .join(" and ");
 
   return (
     <form action={formAction} className="space-y-6">
@@ -276,11 +284,20 @@ export function ApartmentForm({
             </AdminField>
 
             {apartment ? (
-              <CopyField
-                label="Our calendar feed"
-                hint="paste this into Airbnb and Booking.com so they block your direct bookings"
-                value={`${siteUrl}/api/ical/${apartment.ical_export_token}`}
-              />
+              <>
+                <CopyField
+                  label="Our calendar feed"
+                  hint="paste this into Airbnb and Booking.com so they block your direct bookings"
+                  value={`${siteUrl}/api/ical/${apartment.ical_export_token}`}
+                />
+                <p className="text-xs leading-relaxed text-ink-muted">
+                  {channels ? `Importing from ${channels}.` : "Not importing from any channel yet."}{" "}
+                  {apartment.last_synced_at
+                    ? `Last synced ${formatDateTime(apartment.last_synced_at)}.`
+                    : "Not synced yet."}{" "}
+                  Calendars sync automatically every two hours.
+                </p>
+              </>
             ) : (
               <p className="rounded-lg bg-sand-deep/70 px-4 py-3 text-xs text-ink-muted">
                 Save this accommodation first and its outgoing calendar feed will appear
